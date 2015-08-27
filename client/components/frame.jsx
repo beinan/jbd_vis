@@ -1,0 +1,84 @@
+import React from 'react';
+import AppStore from '../stores/app_store'
+
+
+import JvmListDrowDown from './replay_controls/jvm_list_drowdown.jsx'
+class TopNavBar extends React.Component{
+  constructor(props){
+    super(props);
+    this._sidebarToggle = this._sidebarToggle.bind(this);
+  }
+  
+  _sidebarToggle(){
+    $("body").toggleClass('sidebar-collapse');
+  }
+  render(){
+    return (
+      <nav className="navbar navbar-static-top" role="navigation">
+        <a href="#" onClick={this._sidebarToggle} className="sidebar-toggle" role="button">
+          <span className="sr-only">Toggle navigation</span>
+        </a>
+        <div className="navbar-custom-menu">
+          <ul className="nav navbar-nav">
+            <JvmListDrowDown />
+            <li>
+              <a href="#" onClick={()=>$(".control-sidebar").toggleClass("control-sidebar-open")}><i className="fa fa-gears"></i></a>
+            </li>
+          </ul>
+        </div>
+      </nav>  
+    )
+  }
+}
+
+class Header extends React.Component{
+  render() {
+    return (
+      <header className="main-header">
+        <a href="index2.html" className="logo">
+          <span className="logo-mini"><b>J</b></span>
+          <span className="logo-lg"><b>J</b>BD</span>
+        </a>
+        <TopNavBar/>
+      </header>
+    )
+  }  
+}
+
+import MainSideBar from './main_side_bar.jsx'
+import ContentWrapper from './content_wrapper.jsx'
+import ControlSideBar from './replay_controls/control_side_bar.jsx'
+ 
+class Frame extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = AppStore.getData();
+    this._onChange = this._onChange.bind(this);
+  }
+    
+  
+
+  componentDidMount() {
+    AppStore.addEventListener(AppStore.HEIGHT_CHANGE_EVENT, this._onChange);
+  }
+
+  componentWillUnmount() {
+    AppStore.removeEventListener(AppStore.HEIGHT_CHANGE_EVENT , this._onChange);
+  }
+
+  render() {
+    return (
+      <div className="wrapper" style={{height:this.state.height, overflowY:'auto'}}>
+        <Header/>
+        <MainSideBar/>
+        <ContentWrapper/>
+        <ControlSideBar/>
+      </div>
+    );
+  }
+  _onChange() {
+    this.setState(AppStore.getData());
+  }
+}
+ 
+export default Frame;

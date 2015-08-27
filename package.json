@@ -1,0 +1,47 @@
+{
+  "name": "jbd_vis",
+  "version": "1.0.0",
+  "description": "A new visualization project instead of the visualization project in jbd.",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/beinan/jbd_vis.git"
+  },
+  "author": "Beinan",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/beinan/jbd_vis/issues"
+  },
+  "homepage": "https://github.com/beinan/jbd_vis",
+  "dependencies": {
+    "body-parser": "^1.13.2",
+    "compression": "^1.5.1",
+    "connect-assets": "^4.8.0",
+    "es6-promise": "^2.3.0",
+    "express": "^4.13.1",
+    "flux": "^2.0.3",
+    "jade": "^1.11.0",
+    "jquery": "^2.1.4",
+    "keymirror": "^0.1.1",
+    "mongoose": "^4.0.8",
+    "morgan": "^1.6.1",
+    "object-assign": "^3.0.0",
+    "react": "^0.13.3",
+    "react-bootstrap": "^0.24.0",
+    "shelljs": "^0.5.1"
+  },
+  "devDependencies": {
+    "babelify": "^6.1.3",
+    "browserify": "^11.0.0",
+    "gulp-less": "^3.0.3",
+    "gulp-nodemon": "^2.0.3",
+    "gulp-util": "^3.0.6",
+    "lodash.assign": "^3.2.0",
+    "vinyl-buffer": "^1.0.0",
+    "vinyl-source-stream": "^1.1.0",
+    "watchify": "^3.3.0"
+  }
+}
