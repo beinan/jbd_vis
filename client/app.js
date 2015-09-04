@@ -4,12 +4,13 @@ var $ = global.$ = global.jQuery = require('jquery');
 
 var React = require('react');
 import Frame from './components/frame.jsx';
-import AppAction from './actions/app_action.js';
-
-AppAction.setAppHeight($(window).height());
-$(window).resize(()=> AppAction.setAppHeight($(window).height()));
-
+import AppAction from './actions/app_action';
 import ViewType from './view_type';
+import StoreFactory from './stores/store_factory';
+
+AppAction.setHeight($(window).height());
+$(window).resize(()=> AppAction.setHeight($(window).height()));
+
 AppAction.setView(ViewType.JVMS_VIEW);
 
-React.render( <Frame/>, document.getElementById('app_wrapper'));
+React.render( <Frame store={StoreFactory.getAppStore()}/>, document.getElementById('app_wrapper'));

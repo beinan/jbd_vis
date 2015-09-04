@@ -1,8 +1,11 @@
 import React from 'react';
-import AppStore from '../stores/app_store'
+
 
 
 import JvmListDrowDown from './replay_controls/jvm_list_drowdown.jsx'
+
+import {PureRenderCommponent, ImmutablePropComponent} from './common_components.jsx'
+
 class TopNavBar extends React.Component{
   constructor(props){
     super(props);
@@ -48,37 +51,23 @@ class Header extends React.Component{
 import MainSideBar from './main_side_bar.jsx'
 import ContentWrapper from './content_wrapper.jsx'
 import ControlSideBar from './replay_controls/control_side_bar.jsx'
- 
-class Frame extends React.Component {
+
+class Frame extends PureRenderCommponent{
   constructor(props) {
     super(props);
-    this.state = AppStore.getData();
-    this._onChange = this._onChange.bind(this);
   }
-    
-  
-
-  componentDidMount() {
-    AppStore.addEventListener(AppStore.HEIGHT_CHANGE_EVENT, this._onChange);
-  }
-
-  componentWillUnmount() {
-    AppStore.removeEventListener(AppStore.HEIGHT_CHANGE_EVENT , this._onChange);
-  }
-
+      
   render() {
     return (
-      <div className="wrapper" style={{height:this.state.height, overflowY:'auto'}}>
+      <div className="wrapper" style={{height:this.state.data.get("height"), overflowY:'auto'}}>
         <Header/>
-        <MainSideBar/>
-        <ContentWrapper/>
+        <MainSideBar view_name = {this.state.data.get("view_name")}/>
+        <ContentWrapper view_name = {this.state.data.get("view_name")}/>
         <ControlSideBar/>
       </div>
     );
   }
-  _onChange() {
-    this.setState(AppStore.getData());
-  }
+  
 }
  
 export default Frame;

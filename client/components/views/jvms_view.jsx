@@ -1,13 +1,13 @@
 import React from 'react'
 
-import JvmListStore from '../../stores/jvm_list_store';
+import StoreFactory from '../../stores/store_factory';
 import JvmsAction from '../../actions/jvm_action';
 import AppAction from '../../actions/app_action';
 import SimulationAction from '../../actions/simulation_action';
 
 import ViewType from '../../view_type';
 
-import {ContentSection, ContentBox, UploadFileForm} from '../common_components.jsx';
+import {ImmutablePropComponent, PureRenderCommponent, ContentBox} from '../common_components.jsx';
 
 import {Button, Input, Label, Fade, Collapse,Badge, Grid, Row, Col, Well} from 'react-bootstrap';
 
@@ -127,33 +127,19 @@ class JvmEntry extends React.Component{
   }
 }
 
-class JvmListBox extends React.Component{
+class JvmListBox extends PureRenderCommponent{
   constructor(props){
     super(props);
-    this.state = JvmListStore.getData();
-    this._onChange = this._onChange.bind(this);
   }
   
-  componentDidMount() {
-    JvmListStore.addUpdateEventListener(this._onChange);
-  }
-
-  componentWillUnmount() {
-    JvmListStore.removeUpdateEventListener(this._onChange);
-  }
-
-  _onChange() {
-    this.setState(JvmListStore.getData());
-  }
   
- 
   render(){
     console.log(this.state);
     var item_list;
-    if(this.state.status !== "ready")
+    if(this.state.data.get("status") !== "ready")
       item_list = <p>Loading</p>
     else{
-      var items = this.state.jvm_list.map((data)=>
+      var items = this.state.data.get("list").map((data)=>
          <JvmEntry key={data._id} jvm_data={data}/>
          
          );
@@ -173,7 +159,7 @@ class JvmListBox extends React.Component{
 
 
 
-class JvmsView extends React.Component{
+class JvmsView extends ImmutablePropComponent{
   constructor(props){
     super(props);
   }
@@ -196,7 +182,7 @@ class JvmsView extends React.Component{
         {/*content*/}
         <div className="content body">
           <div className="row" >
-            <JvmListBox />           
+            <JvmListBox store={StoreFactory.getJvmProcessListStore()}/>           
           </div>
           
         </div>

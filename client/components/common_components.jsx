@@ -1,7 +1,51 @@
 
-import React from 'react'
+import React from 'react/addons'  //react with all addons
 
 import JobStore from '../stores/job_store'
+
+import StoreFactory from '../stores/store_factory'
+
+/**
+ * Common abstracted React.js component with PureRenderMixin
+ * Each property passed in this Component has to be immutable(such as string, number, immutable object and etc..)
+ * @see https://facebook.github.io/immutable-js/docs/
+ * @see https://facebook.github.io/react/docs/pure-render-mixin.html
+ */
+export class ImmutablePropComponent extends React.Component{
+  constructor(props) {
+    super(props);
+    this.shouldComponentUpdate = React.addons.PureRenderMixin.shouldComponentUpdate.bind(this);
+  }
+} 
+
+/**
+ * Common abstracted cmponent with a common store {@link StoreFactory}
+ * store in props is mandatory
+ * @example 
+ * class MyComponent extends PureRenderCommponent{
+ *  ...
+ * }
+ * <MyComponent store={StoreFactory.getAppStore()} />
+ */
+export class PureRenderCommponent extends ImmutablePropComponent{
+  constructor(props) {
+    super(props);
+    this.state = {data : props.store.getData()};
+    this._onChange = this._onChange.bind(this);
+  }
+
+  componentDidMount() {
+    this.props.store.addEventListener(this._onChange);
+  }
+
+  componentWillUnmount() {
+    this.props.store.removeEventListener(this._onChange);
+  }
+
+  _onChange() {
+    this.setState({data:this.props.store.getData()});
+  }
+}
 
 export class ContentSection extends React.Component{
   
@@ -43,49 +87,6 @@ export class ContentBox extends React.Component{
   }
 }
 
-export class JobOutput extends React.Component{
-  constructor(props){
-    super(props);
-    this.state = {status:"init"}; 
-    this.job_store = new JobStore(props.job_id);
-    this.job_store.update();
-    this._onChange = this._onChange.bind(this);
-  }
-  
-  _onChange(){
-    this.setState(this.job_store.data);
-    console.log(this.job_store.update);
-    if(this.timeout)
-      clearTimeout(this.timeout);
-    this.timeout = setTimeout(this.job_store.update.bind(this.job_store), 20000);
-  }
-
-  componentDidMount() {
-    this.job_store.addUpdateEventListener(this._onChange);
-  }
-
-  componentWillUnmount() {
-    clearTimeout(this.timeout);
-    this.job_store.removeUpdateEventListener(this._onChange);
-  }
-
-  render(){
-    var outputs = "";
-    if(this.state.outputs)
-      outputs = this.state.outputs.map((o)=> "[" + o.date + "]" + o.line).join('\n');
-    console.log("job outputs is rendering",this.state, outputs);
-    return (
-    
-      <pre className="hierarchy bring-up">
-        <code className="language-bash" data-lang="bash">
-          {outputs}
-        </code>
-      </pre>
-
-
-    );
-  }
-}
 
 export class UploadFileForm extends React.Component{
   
@@ -120,9 +121,6 @@ export class UploadFileForm extends React.Component{
   }
   render() {
     var job_output;
-    if(this.state.job_id){
-      job_output = <JobOutput job_id ={this.state.job_id} />
-    }
     return (
       <form encType="multipart/form-data" onSubmit={this.handleSubmit} id="file_upload_form" ref="uploadForm">
         <div className={"form-group has-" + this.state.status}>          
@@ -133,7 +131,7 @@ export class UploadFileForm extends React.Component{
         <button type="submit" className="btn btn-primary">
           <i className="fa fa-upload"></i> Upload
         </button>
-        {job_output}        
+               
       </form>
       
     );

@@ -3,7 +3,7 @@ var ActionType = require('../action_type');
 
 class AppAction {
     
-  setAppHeight(height){
+  setHeight(height){
     AppDispatcher.dispatch({
       actionType: ActionType.APP_HEIGHT_CHANGE,
       height:height

@@ -1,32 +1,21 @@
 import React from 'react'
 import ViewType from '../view_type'
-import AppStore from '../stores/app_store'
 
 import AppAction from '../actions/app_action'
 
-class MenuItem extends React.Component{
+import {ImmutablePropComponent} from './common_components.jsx'
+
+class MenuItem extends ImmutablePropComponent{
 
   constructor(props) {
-    super(props);
-    this.state = {is_active : AppStore.getData().view_name == props.view_name};
-    this._onChange = this._onChange.bind(this);
+    super(props); 
     this._handleClick = this._handleClick.bind(this);
   }
     
-  
-
-  componentDidMount() {
-    AppStore.addEventListener(AppStore.VIEW_CHANGE_EVENT, this._onChange);
-  }
-
-  componentWillUnmount() {
-    AppStore.removeEventListener(AppStore.VIEW_CHANGE_EVENT , this._onChange);
-  }
-
   render() {
     console.log("menu item is rendering", this.props);
     var li_class = "";
-    if(this.state.is_active){
+    if(this.props.is_active){
       li_class = "active";
     }
     return (
@@ -38,49 +27,26 @@ class MenuItem extends React.Component{
       </li>           
     );
   }
-
-  _onChange() {
-    var is_active = (AppStore.getData().view_name === this.props.view_name);
-    if(is_active !== this.state.is_active)
-      this.setState({is_active : is_active});
-  }
  
   _handleClick(e){
-    console.log("menu item onclick", this.props);
     e.preventDefault();
     console.log("menu item click", this.props.view_name);
     AppAction.setView(this.props.view_name);
   }
 }
 
-class MainSideBar extends React.Component{
+class MainSideBar extends ImmutablePropComponent{
   constructor(props) {
     super(props);
-//    this.state = SessionStore.getData();
-//    this._onChange = this._onChange.bind(this);
   }
-    
-  
-
-//  componentDidMount() {
-//    SessionStore.addEventListener(SessionStore.SESSION_READY_EVENT, this._onChange);
-//  }
-
-//  componentWillUnmount() {
-//    SessionStore.removeEventListener(SessionStore.SESSION_READY_EVENT , this._onChange);
-//  }
-
-//  _onChange() {
-//     this.setState(SessionStore.getData());
-//  }
   
 
   render(){
     var sideBarMenu = (
       <ul className="sidebar-menu">
         <li className="header" key="main_menu_section">Main Menu</li>
-        <MenuItem view_name={ViewType.JVMS_VIEW} title="JVM Processes" />
-        <MenuItem view_name={ViewType.SIMULATION_VIEW} title="Simulation" />
+        <MenuItem view_name={ViewType.JVMS_VIEW} title="JVM Processes" is_active={this.props.view_name == ViewType.JVMS_VIEW}/>
+        <MenuItem view_name={ViewType.SIMULATION_VIEW} title="Simulation" is_active={this.props.view_name == ViewType.SIMULATION_VIEW}/>
         
       </ul>
     );

@@ -1,0 +1,143 @@
+{
+  "coverage": "1.01%",
+  "expectCount": 197,
+  "actualCount": 2,
+  "files": {
+    "jbd_vis/client/components/seq_diagram/actor.jsx": {
+      "expectCount": 5,
+      "actualCount": 0
+    },
+    "jbd_vis/client/actions/admin_action.js": {
+      "expectCount": 3,
+      "actualCount": 0
+    },
+    "jbd_vis/client/components/admin/admin_components.jsx": {
+      "expectCount": 6,
+      "actualCount": 0
+    },
+    "jbd_vis/client/stores/admin_jobs_store.js": {
+      "expectCount": 1,
+      "actualCount": 0
+    },
+    "jbd_vis/client/components/admin/admin_monitor_view.jsx": {
+      "expectCount": 4,
+      "actualCount": 0
+    },
+    "jbd_vis/client/components/admin/admin_question_view.jsx": {
+      "expectCount": 4,
+      "actualCount": 0
+    },
+    "jbd_vis/client/actions/app_action.js": {
+      "expectCount": 4,
+      "actualCount": 0
+    },
+    "jbd_vis/client/stores/app_store.js": {
+      "expectCount": 1,
+      "actualCount": 0
+    },
+    "jbd_vis/client/components/assignment_view.jsx": {
+      "expectCount": 7,
+      "actualCount": 0
+    },
+    "jbd_vis/client/actions/assignments_action.js": {
+      "expectCount": 4,
+      "actualCount": 0
+    },
+    "jbd_vis/client/stores/assignments_store.js": {
+      "expectCount": 1,
+      "actualCount": 0
+    },
+    "jbd_vis/client/actions/common_store_action.js": {
+      "expectCount": 5,
+      "actualCount": 0
+    },
+    "jbd_vis/client/components/common_components.jsx": {
+      "expectCount": 20,
+      "actualCount": 2
+    },
+    "jbd_vis/client/components/content_wrapper.jsx": {
+      "expectCount": 7,
+      "actualCount": 0
+    },
+    "jbd_vis/client/components/replay_controls/control_side_bar.jsx": {
+      "expectCount": 7,
+      "actualCount": 0
+    },
+    "jbd_vis/client/stores/jvm_store.js": {
+      "expectCount": 10,
+      "actualCount": 0
+    },
+    "jbd_vis/client/components/frame.jsx": {
+      "expectCount": 4,
+      "actualCount": 0
+    },
+    "jbd_vis/client/actions/jvm_action.js": {
+      "expectCount": 3,
+      "actualCount": 0
+    },
+    "jbd_vis/client/stores/job_store.js": {
+      "expectCount": 8,
+      "actualCount": 0
+    },
+    "jbd_vis/client/components/replay_controls/jvm_list_drowdown.jsx": {
+      "expectCount": 7,
+      "actualCount": 0
+    },
+    "jbd_vis/client/stores/jvm_list_store.js": {
+      "expectCount": 1,
+      "actualCount": 0
+    },
+    "jbd_vis/client/components/views/jvms_view.jsx": {
+      "expectCount": 4,
+      "actualCount": 0
+    },
+    "jbd_vis/client/components/seq_diagram/lifeline.jsx": {
+      "expectCount": 5,
+      "actualCount": 0
+    },
+    "jbd_vis/client/components/main_side_bar.jsx": {
+      "expectCount": 4,
+      "actualCount": 0
+    },
+    "jbd_vis/client/components/replay_controls/replay_panel.jsx": {
+      "expectCount": 9,
+      "actualCount": 0
+    },
+    "jbd_vis/client/stores/replay_store.js": {
+      "expectCount": 9,
+      "actualCount": 0
+    },
+    "jbd_vis/client/stores/seq_diag_store.js": {
+      "expectCount": 19,
+      "actualCount": 0
+    },
+    "jbd_vis/client/components/seq_diagram/seq_diagram.jsx": {
+      "expectCount": 8,
+      "actualCount": 0
+    },
+    "jbd_vis/client/stores/session_store.js": {
+      "expectCount": 1,
+      "actualCount": 0
+    },
+    "jbd_vis/client/components/seq_diagram/signal.jsx": {
+      "expectCount": 10,
+      "actualCount": 0
+    },
+    "jbd_vis/client/actions/simulation_action.js": {
+      "expectCount": 5,
+      "actualCount": 0
+    },
+    "jbd_vis/client/stores/simulation_store.js": {
+      "expectCount": 1,
+      "actualCount": 0
+    },
+    "jbd_vis/client/components/views/simulation_view.jsx": {
+      "expectCount": 7,
+      "actualCount": 0
+    },
+    "jbd_vis/client/stores/store_factory.js": {
+      "expectCount": 3,
+      "actualCount": 0
+    }
+  }
+}

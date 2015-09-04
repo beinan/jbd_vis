@@ -1,0 +1,837 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <base data-ice="baseUrl" href="../../../">
+  <title data-ice="title">jbd_vis/client/admin_lte.js | API Document</title>
+  <link type="text/css" rel="stylesheet" href="css/style.css">
+  <link type="text/css" rel="stylesheet" href="css/prettify-tomorrow.css">
+  <script src="script/prettify/prettify.js"></script>
+  
+  
+</head>
+<body class="layout-container">
+
+<header>
+  <a href="./">Home</a>
+  <a href="identifiers.html">Identifier</a>
+  <a href="source.html">Source</a>
+  
+  <a data-ice="repoURL" href="https://github.com/beinan/jbd_vis.git" class="repo-url-github">Repository</a>
+  <div class="search-box">
+  <span>
+    <img src="./image/search.png">
+    <span class="search-input-edge"></span><input class="search-input"><span class="search-input-edge"></span>
+  </span>
+    <ul class="search-result"></ul>
+  </div>
+</header>
+
+<nav class="navigation" data-ice="nav"><div data-ice="classWrap">
+  <h2>Class</h2>
+  <ul>
+    
+  <li data-ice="classDoc"><span><a href="class/jbd_vis/client/components/seq_diagram/actor.jsx~Actor.html">Actor</a></span></li>
+<li data-ice="classDoc"><span><a href="class/jbd_vis/client/actions/admin_action.js~AdminAction.html">AdminAction</a></span></li>
+<li data-ice="classDoc"><span><a href="class/jbd_vis/client/components/admin/admin_components.jsx~AdminJobsBox.html">AdminJobsBox</a></span></li>
+<li data-ice="classDoc"><span><a href="class/jbd_vis/client/components/admin/admin_monitor_view.jsx~AdminMonitorView.html">AdminMonitorView</a></span></li>
+<li data-ice="classDoc"><span><a href="class/jbd_vis/client/components/admin/admin_question_view.jsx~AdminQuestionView.html">AdminQuestionView</a></span></li>
+<li data-ice="classDoc"><span><a href="class/jbd_vis/client/actions/app_action.js~AppAction.html">AppAction</a></span></li>
+<li data-ice="classDoc"><span><a href="class/jbd_vis/client/components/assignment_view.jsx~AssignmentView.html">AssignmentView</a></span></li>
+<li data-ice="classDoc"><span><a href="class/jbd_vis/client/actions/assignments_action.js~AssignmentsAction.html">AssignmentsAction</a></span></li>
+<li data-ice="classDoc"><span><a href="class/jbd_vis/client/actions/common_store_action.js~CommonStoreAction.html">CommonStoreAction</a></span></li>
+<li data-ice="classDoc"><span><a href="class/jbd_vis/client/components/common_components.jsx~ContentBox.html">ContentBox</a></span></li>
+<li data-ice="classDoc"><span><a href="class/jbd_vis/client/components/common_components.jsx~ContentSection.html">ContentSection</a></span></li>
+<li data-ice="classDoc"><span><a href="class/jbd_vis/client/components/content_wrapper.jsx~ContentWrapper.html">ContentWrapper</a></span></li>
+<li data-ice="classDoc"><span><a href="class/jbd_vis/client/components/replay_controls/control_side_bar.jsx~ControlSideBar.html">ControlSideBar</a></span></li>
+<li data-ice="classDoc"><span><a href="class/jbd_vis/client/components/frame.jsx~Frame.html">Frame</a></span></li>
+<li data-ice="classDoc"><span><a href="class/jbd_vis/client/components/common_components.jsx~ImmutablePropComponent.html">ImmutablePropComponent</a></span></li>
+<li data-ice="classDoc"><span><a href="class/jbd_vis/client/actions/jvm_action.js~JVMAction.html">JVMAction</a></span></li>
+<li data-ice="classDoc"><span><a href="class/jbd_vis/client/stores/job_store.js~JobStore.html">JobStore</a></span></li>
+<li data-ice="classDoc"><span><a href="class/jbd_vis/client/components/replay_controls/jvm_list_drowdown.jsx~JvmListDrowDown.html">JvmListDrowDown</a></span></li>
+<li data-ice="classDoc"><span><a href="class/jbd_vis/client/stores/jvm_store.js~JvmStore.html">JvmStore</a></span></li>
+<li data-ice="classDoc"><span><a href="class/jbd_vis/client/components/views/jvms_view.jsx~JvmsView.html">JvmsView</a></span></li>
+<li data-ice="classDoc"><span><a href="class/jbd_vis/client/components/seq_diagram/lifeline.jsx~Lifeline.html">Lifeline</a></span></li>
+<li data-ice="classDoc"><span><a href="class/jbd_vis/client/components/main_side_bar.jsx~MainSideBar.html">MainSideBar</a></span></li>
+<li data-ice="classDoc"><span><a href="class/jbd_vis/client/components/common_components.jsx~PureRenderCommponent.html">PureRenderCommponent</a></span></li>
+<li data-ice="classDoc"><span><a href="class/jbd_vis/client/components/replay_controls/replay_panel.jsx~ReplayPanel.html">ReplayPanel</a></span></li>
+<li data-ice="classDoc"><span><a href="class/jbd_vis/client/stores/replay_store.js~ReplayStore.html">ReplayStore</a></span></li>
+<li data-ice="classDoc"><span><a href="class/jbd_vis/client/stores/seq_diag_store.js~SeqDiagStore.html">SeqDiagStore</a></span></li>
+<li data-ice="classDoc"><span><a href="class/jbd_vis/client/components/seq_diagram/seq_diagram.jsx~SeqDiagram.html">SeqDiagram</a></span></li>
+<li data-ice="classDoc"><span><a href="class/jbd_vis/client/components/seq_diagram/signal.jsx~Signal.html">Signal</a></span></li>
+<li data-ice="classDoc"><span><a href="class/jbd_vis/client/actions/simulation_action.js~SimulationAction.html">SimulationAction</a></span></li>
+<li data-ice="classDoc"><span><a href="class/jbd_vis/client/components/views/simulation_view.jsx~SimulationView.html">SimulationView</a></span></li>
+<li data-ice="classDoc"><span><a href="class/jbd_vis/client/stores/store_factory.js~StoreFactory.html">StoreFactory</a></span></li>
+<li data-ice="classDoc"><span><a href="class/jbd_vis/client/components/common_components.jsx~UploadFileForm.html">UploadFileForm</a></span></li>
+</ul>
+</div>
+
+
+
+
+
+<div data-ice="variableWrap">
+  <h2><a href="variable/">Variable</a></h2>
+  <ul>
+    
+  <li data-ice="variableDoc"><span><a href="variable/index.html#static-variable-AdminJobsStore">AdminJobsStore</a></span></li>
+<li data-ice="variableDoc"><span><a href="variable/index.html#static-variable-AppStore">AppStore</a></span></li>
+<li data-ice="variableDoc"><span><a href="variable/index.html#static-variable-AssignmentsStore">AssignmentsStore</a></span></li>
+<li data-ice="variableDoc"><span><a href="variable/index.html#static-variable-EventEmitter">EventEmitter</a></span></li>
+<li data-ice="variableDoc"><span><a href="variable/index.html#static-variable-JvmListStore">JvmListStore</a></span></li>
+<li data-ice="variableDoc"><span><a href="variable/index.html#static-variable-SessionStore">SessionStore</a></span></li>
+<li data-ice="variableDoc"><span><a href="variable/index.html#static-variable-SimulationStore">SimulationStore</a></span></li>
+<li data-ice="variableDoc"><span><a href="variable/index.html#static-variable-actor">actor</a></span></li>
+<li data-ice="variableDoc"><span><a href="variable/index.html#static-variable-adminMonitorView">adminMonitorView</a></span></li>
+<li data-ice="variableDoc"><span><a href="variable/index.html#static-variable-adminQuestionView">adminQuestionView</a></span></li>
+<li data-ice="variableDoc"><span><a href="variable/index.html#static-variable-assignmentView">assignmentView</a></span></li>
+<li data-ice="variableDoc"><span><a href="variable/index.html#static-variable-contentWrapper">contentWrapper</a></span></li>
+<li data-ice="variableDoc"><span><a href="variable/index.html#static-variable-controlSideBar">controlSideBar</a></span></li>
+<li data-ice="variableDoc"><span><a href="variable/index.html#static-variable-frame">frame</a></span></li>
+<li data-ice="variableDoc"><span><a href="variable/index.html#static-variable-instance">instance</a></span></li>
+<li data-ice="variableDoc"><span><a href="variable/index.html#static-variable-instance">instance</a></span></li>
+<li data-ice="variableDoc"><span><a href="variable/index.html#static-variable-instance">instance</a></span></li>
+<li data-ice="variableDoc"><span><a href="variable/index.html#static-variable-instance">instance</a></span></li>
+<li data-ice="variableDoc"><span><a href="variable/index.html#static-variable-instance">instance</a></span></li>
+<li data-ice="variableDoc"><span><a href="variable/index.html#static-variable-instance">instance</a></span></li>
+<li data-ice="variableDoc"><span><a href="variable/index.html#static-variable-instance">instance</a></span></li>
+<li data-ice="variableDoc"><span><a href="variable/index.html#static-variable-jobStore">jobStore</a></span></li>
+<li data-ice="variableDoc"><span><a href="variable/index.html#static-variable-jvmListDrowDown">jvmListDrowDown</a></span></li>
+<li data-ice="variableDoc"><span><a href="variable/index.html#static-variable-jvmStore">jvmStore</a></span></li>
+<li data-ice="variableDoc"><span><a href="variable/index.html#static-variable-jvmsView">jvmsView</a></span></li>
+<li data-ice="variableDoc"><span><a href="variable/index.html#static-variable-lifeline">lifeline</a></span></li>
+<li data-ice="variableDoc"><span><a href="variable/index.html#static-variable-mainSideBar">mainSideBar</a></span></li>
+<li data-ice="variableDoc"><span><a href="variable/index.html#static-variable-replayPanel">replayPanel</a></span></li>
+<li data-ice="variableDoc"><span><a href="variable/index.html#static-variable-replayStore">replayStore</a></span></li>
+<li data-ice="variableDoc"><span><a href="variable/index.html#static-variable-seqDiagStore">seqDiagStore</a></span></li>
+<li data-ice="variableDoc"><span><a href="variable/index.html#static-variable-seqDiagram">seqDiagram</a></span></li>
+<li data-ice="variableDoc"><span><a href="variable/index.html#static-variable-signal">signal</a></span></li>
+<li data-ice="variableDoc"><span><a href="variable/index.html#static-variable-simulationView">simulationView</a></span></li>
+</ul>
+</div>
+
+
+
+
+</nav>
+
+<div class="content" data-ice="content"><h1 data-ice="title">jbd_vis/client/admin_lte.js</h1>
+<pre class="source-code line-number raw-source-code"><code class="prettyprint linenums" data-ice="content">/*! AdminLTE app.js
+ * ================
+ * Main JS application file for AdminLTE v2. This file
+ * should be included in all pages. It controls some layout
+ * options and implements exclusive AdminLTE plugins.
+ *
+ * @Author  Almsaeed Studio
+ * @Support &lt;http://www.almsaeedstudio.com&gt;
+ * @Email   &lt;support@almsaeedstudio.com&gt;
+ * @version 2.1.0
+ * @license MIT &lt;http://opensource.org/licenses/MIT&gt;
+ */
+
+&apos;use strict&apos;;
+
+//Make sure jQuery has been loaded before app.js
+if (typeof jQuery === &quot;undefined&quot;) {
+  throw new Error(&quot;AdminLTE requires jQuery&quot;);
+}
+
+/* AdminLTE
+ *
+ * @type Object
+ * @description $.AdminLTE is the main object for the template&apos;s app.
+ *              It&apos;s used for implementing functions and options related
+ *              to the template. Keeping everything wrapped in an object
+ *              prevents conflict with other plugins and is a better
+ *              way to organize our code.
+ */
+$.AdminLTE = {};
+
+/* --------------------
+ * - AdminLTE Options -
+ * --------------------
+ * Modify these options to suit your implementation
+ */
+$.AdminLTE.options = {
+  //Add slimscroll to navbar menus
+  //This requires you to load the slimscroll plugin
+  //in every page before app.js
+  navbarMenuSlimscroll: true,
+  navbarMenuSlimscrollWidth: &quot;3px&quot;, //The width of the scroll bar
+  navbarMenuHeight: &quot;200px&quot;, //The height of the inner menu
+  //Sidebar push menu toggle button selector
+  sidebarToggleSelector: &quot;[data-toggle=&apos;offcanvas&apos;]&quot;,
+  //Activate sidebar push menu
+  sidebarPushMenu: true,
+  //Activate sidebar slimscroll if the fixed layout is set (requires SlimScroll Plugin)
+  sidebarSlimScroll: true,
+  //Enable sidebar expand on hover effect for sidebar mini
+  //This option is forced to true if both the fixed layout and sidebar mini
+  //are used together
+  sidebarExpandOnHover: false,
+  //BoxRefresh Plugin
+  enableBoxRefresh: true,
+  //Bootstrap.js tooltip
+  enableBSToppltip: true,
+  BSTooltipSelector: &quot;[data-toggle=&apos;tooltip&apos;]&quot;,
+  //Enable Fast Click. Fastclick.js creates a more
+  //native touch experience with touch devices. If you
+  //choose to enable the plugin, make sure you load the script
+  //before AdminLTE&apos;s app.js
+  enableFastclick: true,
+  //Control Sidebar Options
+  enableControlSidebar: true,
+  controlSidebarOptions: {
+    //Which button should trigger the open/close event
+    toggleBtnSelector: &quot;[data-toggle=&apos;control-sidebar&apos;]&quot;,
+    //The sidebar selector
+    selector: &quot;.control-sidebar&quot;,
+    //Enable slide over content
+    slide: true
+  },
+  //Box Widget Plugin. Enable this plugin
+  //to allow boxes to be collapsed and/or removed
+  enableBoxWidget: true,
+  //Box Widget plugin options
+  boxWidgetOptions: {
+    boxWidgetIcons: {
+      //Collapse icon
+      collapse: &apos;fa-minus&apos;,
+      //Open icon
+      open: &apos;fa-plus&apos;,
+      //Remove icon
+      remove: &apos;fa-times&apos;
+    },
+    boxWidgetSelectors: {
+      //Remove button selector
+      remove: &apos;[data-widget=&quot;remove&quot;]&apos;,
+      //Collapse button selector
+      collapse: &apos;[data-widget=&quot;collapse&quot;]&apos;
+    }
+  },
+  //Direct Chat plugin options
+  directChat: {
+    //Enable direct chat by default
+    enable: true,
+    //The button to open and close the chat contacts pane
+    contactToggleSelector: &apos;[data-widget=&quot;chat-pane-toggle&quot;]&apos;
+  },
+  //Define the set of colors to use globally around the website
+  colors: {
+    lightBlue: &quot;#3c8dbc&quot;,
+    red: &quot;#f56954&quot;,
+    green: &quot;#00a65a&quot;,
+    aqua: &quot;#00c0ef&quot;,
+    yellow: &quot;#f39c12&quot;,
+    blue: &quot;#0073b7&quot;,
+    navy: &quot;#001F3F&quot;,
+    teal: &quot;#39CCCC&quot;,
+    olive: &quot;#3D9970&quot;,
+    lime: &quot;#01FF70&quot;,
+    orange: &quot;#FF851B&quot;,
+    fuchsia: &quot;#F012BE&quot;,
+    purple: &quot;#8E24AA&quot;,
+    maroon: &quot;#D81B60&quot;,
+    black: &quot;#222222&quot;,
+    gray: &quot;#d2d6de&quot;
+  },
+  //The standard screen sizes that bootstrap uses.
+  //If you change these in the variables.less file, change
+  //them here too.
+  screenSizes: {
+    xs: 480,
+    sm: 768,
+    md: 992,
+    lg: 1200
+  }
+};
+
+/* ------------------
+ * - Implementation -
+ * ------------------
+ * The next block of code implements AdminLTE&apos;s
+ * functions and plugins as specified by the
+ * options above.
+ */
+$(function () {
+  //Extend options if external options exist
+  if (typeof AdminLTEOptions !== &quot;undefined&quot;) {
+    $.extend(true,
+            $.AdminLTE.options,
+            AdminLTEOptions);
+  }
+
+  //Easy access to options
+  var o = $.AdminLTE.options;
+
+  //Set up the object
+  _init();
+
+  //Activate the layout maker
+  $.AdminLTE.layout.activate();
+
+  //Enable sidebar tree view controls
+  $.AdminLTE.tree(&apos;.sidebar&apos;);
+
+  //Enable control sidebar
+  if (o.enableControlSidebar) {
+    $.AdminLTE.controlSidebar.activate();
+  }
+
+  //Add slimscroll to navbar dropdown
+  if (o.navbarMenuSlimscroll &amp;&amp; typeof $.fn.slimscroll != &apos;undefined&apos;) {
+    $(&quot;.navbar .menu&quot;).slimscroll({
+      height: o.navbarMenuHeight,
+      alwaysVisible: false,
+      size: o.navbarMenuSlimscrollWidth
+    }).css(&quot;width&quot;, &quot;100%&quot;);
+  }
+
+  //Activate sidebar push menu
+  if (o.sidebarPushMenu) {
+    $.AdminLTE.pushMenu.activate(o.sidebarToggleSelector);
+  }
+
+  //Activate Bootstrap tooltip
+  if (o.enableBSToppltip) {
+    $(&apos;body&apos;).tooltip({
+      selector: o.BSTooltipSelector
+    });
+  }
+
+  //Activate box widget
+  if (o.enableBoxWidget) {
+    $.AdminLTE.boxWidget.activate();
+  }
+
+  //Activate fast click
+  if (o.enableFastclick &amp;&amp; typeof FastClick != &apos;undefined&apos;) {
+    FastClick.attach(document.body);
+  }
+
+  //Activate direct chat widget
+  if (o.directChat.enable) {
+    $(o.directChat.contactToggleSelector).on(&apos;click&apos;, function () {
+      var box = $(this).parents(&apos;.direct-chat&apos;).first();
+      box.toggleClass(&apos;direct-chat-contacts-open&apos;);
+    });
+  }
+
+  /*
+   * INITIALIZE BUTTON TOGGLE
+   * ------------------------
+   */
+  $(&apos;.btn-group[data-toggle=&quot;btn-toggle&quot;]&apos;).each(function () {
+    var group = $(this);
+    $(this).find(&quot;.btn&quot;).on(&apos;click&apos;, function (e) {
+      group.find(&quot;.btn.active&quot;).removeClass(&quot;active&quot;);
+      $(this).addClass(&quot;active&quot;);
+      e.preventDefault();
+    });
+
+  });
+});
+
+/* ----------------------------------
+ * - Initialize the AdminLTE Object -
+ * ----------------------------------
+ * All AdminLTE functions are implemented below.
+ */
+function _init() {
+
+  /* Layout
+   * ======
+   * Fixes the layout height in case min-height fails.
+   *
+   * @type Object
+   * @usage $.AdminLTE.layout.activate()
+   *        $.AdminLTE.layout.fix()
+   *        $.AdminLTE.layout.fixSidebar()
+   */
+  $.AdminLTE.layout = {
+    activate: function () {
+      var _this = this;
+      _this.fix();
+      _this.fixSidebar();
+      $(window, &quot;.wrapper&quot;).resize(function () {
+        _this.fix();
+        _this.fixSidebar();
+      });
+    },
+    fix: function () {
+      //Get window height and the wrapper height
+      var neg = $(&apos;.main-header&apos;).outerHeight() + $(&apos;.main-footer&apos;).outerHeight();
+      var window_height = $(window).height();
+      var sidebar_height = $(&quot;.sidebar&quot;).height();
+      //Set the min-height of the content and sidebar based on the
+      //the height of the document.
+      if ($(&quot;body&quot;).hasClass(&quot;fixed&quot;)) {
+        $(&quot;.content-wrapper, .right-side&quot;).css(&apos;min-height&apos;, window_height - $(&apos;.main-footer&apos;).outerHeight());
+      } else {
+        var postSetWidth;
+        if (window_height &gt;= sidebar_height) {
+          $(&quot;.content-wrapper, .right-side&quot;).css(&apos;min-height&apos;, window_height - neg);
+          postSetWidth = window_height - neg;
+        } else {
+          $(&quot;.content-wrapper, .right-side&quot;).css(&apos;min-height&apos;, sidebar_height);
+          postSetWidth = sidebar_height;
+        }
+
+        //Fix for the control sidebar height
+        var controlSidebar = $($.AdminLTE.options.controlSidebarOptions.selector);
+        if (typeof controlSidebar !== &quot;undefined&quot;) {
+          if (controlSidebar.height() &gt; postSetWidth)
+            $(&quot;.content-wrapper, .right-side&quot;).css(&apos;min-height&apos;, controlSidebar.height());
+        }
+
+      }
+    },
+    fixSidebar: function () {
+      //Make sure the body tag has the .fixed class
+      if (!$(&quot;body&quot;).hasClass(&quot;fixed&quot;)) {
+        if (typeof $.fn.slimScroll != &apos;undefined&apos;) {
+          $(&quot;.sidebar&quot;).slimScroll({destroy: true}).height(&quot;auto&quot;);
+        }
+        return;
+      } else if (typeof $.fn.slimScroll == &apos;undefined&apos; &amp;&amp; console) {
+        console.error(&quot;Error: the fixed layout requires the slimscroll plugin!&quot;);
+      }
+      //Enable slimscroll for fixed layout
+      if ($.AdminLTE.options.sidebarSlimScroll) {
+        if (typeof $.fn.slimScroll != &apos;undefined&apos;) {
+          //Destroy if it exists
+          $(&quot;.sidebar&quot;).slimScroll({destroy: true}).height(&quot;auto&quot;);
+          //Add slimscroll
+          $(&quot;.sidebar&quot;).slimscroll({
+            height: ($(window).height() - $(&quot;.main-header&quot;).height()) + &quot;px&quot;,
+            color: &quot;rgba(0,0,0,0.2)&quot;,
+            size: &quot;3px&quot;
+          });
+        }
+      }
+    }
+  };
+
+  /* PushMenu()
+   * ==========
+   * Adds the push menu functionality to the sidebar.
+   *
+   * @type Function
+   * @usage: $.AdminLTE.pushMenu(&quot;[data-toggle=&apos;offcanvas&apos;]&quot;)
+   */
+  $.AdminLTE.pushMenu = {
+    activate: function (toggleBtn) {
+      //Get the screen sizes
+      var screenSizes = $.AdminLTE.options.screenSizes;
+
+      //Enable sidebar toggle
+      $(toggleBtn).on(&apos;click&apos;, function (e) {
+        e.preventDefault();
+
+        //Enable sidebar push menu
+        if ($(window).width() &gt; (screenSizes.sm - 1)) {
+          $(&quot;body&quot;).toggleClass(&apos;sidebar-collapse&apos;);
+        }
+        //Handle sidebar push menu for small screens
+        else {
+          if ($(&quot;body&quot;).hasClass(&apos;sidebar-open&apos;)) {
+            $(&quot;body&quot;).removeClass(&apos;sidebar-open&apos;);
+            $(&quot;body&quot;).removeClass(&apos;sidebar-collapse&apos;)
+          } else {
+            $(&quot;body&quot;).addClass(&apos;sidebar-open&apos;);
+          }
+        }
+      });
+
+      $(&quot;.content-wrapper&quot;).click(function () {
+        //Enable hide menu when clicking on the content-wrapper on small screens
+        if ($(window).width() &lt;= (screenSizes.sm - 1) &amp;&amp; $(&quot;body&quot;).hasClass(&quot;sidebar-open&quot;)) {
+          $(&quot;body&quot;).removeClass(&apos;sidebar-open&apos;);
+        }
+      });
+
+      //Enable expand on hover for sidebar mini
+      if ($.AdminLTE.options.sidebarExpandOnHover
+              || ($(&apos;body&apos;).hasClass(&apos;fixed&apos;)
+                      &amp;&amp; $(&apos;body&apos;).hasClass(&apos;sidebar-mini&apos;))) {
+        this.expandOnHover();
+      }
+
+    },
+    expandOnHover: function () {
+      var _this = this;
+      var screenWidth = $.AdminLTE.options.screenSizes.sm - 1;
+      //Expand sidebar on hover
+      $(&apos;.main-sidebar&apos;).hover(function () {
+        if ($(&apos;body&apos;).hasClass(&apos;sidebar-mini&apos;)
+                &amp;&amp; $(&quot;body&quot;).hasClass(&apos;sidebar-collapse&apos;)
+                &amp;&amp; $(window).width() &gt; screenWidth) {
+          _this.expand();
+        }
+      }, function () {
+        if ($(&apos;body&apos;).hasClass(&apos;sidebar-mini&apos;)
+                &amp;&amp; $(&apos;body&apos;).hasClass(&apos;sidebar-expanded-on-hover&apos;)
+                &amp;&amp; $(window).width() &gt; screenWidth) {
+          _this.collapse();
+        }
+      });
+    },
+    expand: function () {
+      $(&quot;body&quot;).removeClass(&apos;sidebar-collapse&apos;).addClass(&apos;sidebar-expanded-on-hover&apos;);
+    },
+    collapse: function () {
+      if ($(&apos;body&apos;).hasClass(&apos;sidebar-expanded-on-hover&apos;)) {
+        $(&apos;body&apos;).removeClass(&apos;sidebar-expanded-on-hover&apos;).addClass(&apos;sidebar-collapse&apos;);
+      }
+    }
+  };
+
+  /* Tree()
+   * ======
+   * Converts the sidebar into a multilevel
+   * tree view menu.
+   *
+   * @type Function
+   * @Usage: $.AdminLTE.tree(&apos;.sidebar&apos;)
+   */
+  $.AdminLTE.tree = function (menu) {
+    var _this = this;
+
+    $(&quot;li a&quot;, $(menu)).on(&apos;click&apos;, function (e) {
+      //Get the clicked link and the next element
+      var $this = $(this);
+      var checkElement = $this.next();
+
+      //Check if the next element is a menu and is visible
+      if ((checkElement.is(&apos;.treeview-menu&apos;)) &amp;&amp; (checkElement.is(&apos;:visible&apos;))) {
+        //Close the menu
+        checkElement.slideUp(&apos;normal&apos;, function () {
+          checkElement.removeClass(&apos;menu-open&apos;);
+          //Fix the layout in case the sidebar stretches over the height of the window
+          //_this.layout.fix();
+        });
+        checkElement.parent(&quot;li&quot;).removeClass(&quot;active&quot;);
+      }
+      //If the menu is not visible
+      else if ((checkElement.is(&apos;.treeview-menu&apos;)) &amp;&amp; (!checkElement.is(&apos;:visible&apos;))) {
+        //Get the parent menu
+        var parent = $this.parents(&apos;ul&apos;).first();
+        //Close all open menus within the parent
+        var ul = parent.find(&apos;ul:visible&apos;).slideUp(&apos;normal&apos;);
+        //Remove the menu-open class from the parent
+        ul.removeClass(&apos;menu-open&apos;);
+        //Get the parent li
+        var parent_li = $this.parent(&quot;li&quot;);
+
+        //Open the target menu and add the menu-open class
+        checkElement.slideDown(&apos;normal&apos;, function () {
+          //Add the class active to the parent li
+          checkElement.addClass(&apos;menu-open&apos;);
+          parent.find(&apos;li.active&apos;).removeClass(&apos;active&apos;);
+          parent_li.addClass(&apos;active&apos;);
+          //Fix the layout in case the sidebar stretches over the height of the window
+          _this.layout.fix();
+        });
+      }
+      //if this isn&apos;t a link, prevent the page from being redirected
+      if (checkElement.is(&apos;.treeview-menu&apos;)) {
+        e.preventDefault();
+      }
+    });
+  };
+
+  /* ControlSidebar
+   * ==============
+   * Adds functionality to the right sidebar
+   *
+   * @type Object
+   * @usage $.AdminLTE.controlSidebar.activate(options)
+   */
+  $.AdminLTE.controlSidebar = {
+    //instantiate the object
+    activate: function () {
+      //Get the object
+      var _this = this;
+      //Update options
+      var o = $.AdminLTE.options.controlSidebarOptions;
+      //Get the sidebar
+      var sidebar = $(o.selector);
+      //The toggle button
+      var btn = $(o.toggleBtnSelector);
+
+      //Listen to the click event
+      btn.on(&apos;click&apos;, function (e) {
+        e.preventDefault();
+        //If the sidebar is not open
+        if (!sidebar.hasClass(&apos;control-sidebar-open&apos;)
+                &amp;&amp; !$(&apos;body&apos;).hasClass(&apos;control-sidebar-open&apos;)) {
+          //Open the sidebar
+          _this.open(sidebar, o.slide);
+        } else {
+          _this.close(sidebar, o.slide);
+        }
+      });
+
+      //If the body has a boxed layout, fix the sidebar bg position
+      var bg = $(&quot;.control-sidebar-bg&quot;);
+      _this._fix(bg);
+
+      //If the body has a fixed layout, make the control sidebar fixed      
+      if ($(&apos;body&apos;).hasClass(&apos;fixed&apos;)) {
+        _this._fixForFixed(sidebar);
+      } else {
+        //If the content height is less than the sidebar&apos;s height, force max height
+        if ($(&apos;.content-wrapper, .right-side&apos;).height() &lt; sidebar.height()) {
+          _this._fixForContent(sidebar);
+        }
+      }
+    },
+    //Open the control sidebar
+    open: function (sidebar, slide) {
+      var _this = this;
+      //Slide over content
+      if (slide) {
+        sidebar.addClass(&apos;control-sidebar-open&apos;);
+      } else {
+        //Push the content by adding the open class to the body instead 
+        //of the sidebar itself
+        $(&apos;body&apos;).addClass(&apos;control-sidebar-open&apos;);
+      }
+    },
+    //Close the control sidebar
+    close: function (sidebar, slide) {
+      if (slide) {
+        sidebar.removeClass(&apos;control-sidebar-open&apos;);
+      } else {
+        $(&apos;body&apos;).removeClass(&apos;control-sidebar-open&apos;);
+      }
+    },
+    _fix: function (sidebar) {
+      var _this = this;
+      if ($(&quot;body&quot;).hasClass(&apos;layout-boxed&apos;)) {
+        sidebar.css(&apos;position&apos;, &apos;absolute&apos;);
+        sidebar.height($(&quot;.wrapper&quot;).height());
+        $(window).resize(function () {
+          _this._fix(sidebar);
+        });
+      } else {
+        sidebar.css({
+          &apos;position&apos;: &apos;fixed&apos;,
+          &apos;height&apos;: &apos;auto&apos;
+        });
+      }
+    },
+    _fixForFixed: function (sidebar) {
+      sidebar.css({
+        &apos;position&apos;: &apos;fixed&apos;,
+        &apos;max-height&apos;: &apos;100%&apos;,
+        &apos;overflow&apos;: &apos;auto&apos;,
+        &apos;padding-bottom&apos;: &apos;50px&apos;
+      });
+    },
+    _fixForContent: function (sidebar) {
+      $(&quot;.content-wrapper, .right-side&quot;).css(&apos;min-height&apos;, sidebar.height());
+    }
+  };
+
+  /* BoxWidget
+   * =========
+   * BoxWidget is a plugin to handle collapsing and
+   * removing boxes from the screen.
+   *
+   * @type Object
+   * @usage $.AdminLTE.boxWidget.activate()
+   *        Set all your options in the main $.AdminLTE.options object
+   */
+  $.AdminLTE.boxWidget = {
+    selectors: $.AdminLTE.options.boxWidgetOptions.boxWidgetSelectors,
+    icons: $.AdminLTE.options.boxWidgetOptions.boxWidgetIcons,
+    activate: function () {
+      var _this = this;
+      //Listen for collapse event triggers
+      $(_this.selectors.collapse).on(&apos;click&apos;, function (e) {
+        e.preventDefault();
+        _this.collapse($(this));
+      });
+
+      //Listen for remove event triggers
+      $(_this.selectors.remove).on(&apos;click&apos;, function (e) {
+        e.preventDefault();
+        _this.remove($(this));
+      });
+    },
+    collapse: function (element) {
+      var _this = this;
+      //Find the box parent
+      var box = element.parents(&quot;.box&quot;).first();
+      //Find the body and the footer
+      var box_content = box.find(&quot;&gt; .box-body, &gt; .box-footer&quot;);
+      if (!box.hasClass(&quot;collapsed-box&quot;)) {
+        //Convert minus into plus
+        element.children(&quot;:first&quot;)
+                .removeClass(_this.icons.collapse)
+                .addClass(_this.icons.open);
+        //Hide the content
+        box_content.slideUp(300, function () {
+          box.addClass(&quot;collapsed-box&quot;);
+        });
+      } else {
+        //Convert plus into minus
+        element.children(&quot;:first&quot;)
+                .removeClass(_this.icons.open)
+                .addClass(_this.icons.collapse);
+        //Show the content
+        box_content.slideDown(300, function () {
+          box.removeClass(&quot;collapsed-box&quot;);
+        });
+      }
+    },
+    remove: function (element) {
+      //Find the box parent
+      var box = element.parents(&quot;.box&quot;).first();
+      box.slideUp();
+    }
+  };
+}
+
+/* ------------------
+ * - Custom Plugins -
+ * ------------------
+ * All custom plugins are defined below.
+ */
+
+/*
+ * BOX REFRESH BUTTON
+ * ------------------
+ * This is a custom plugin to use with the component BOX. It allows you to add
+ * a refresh button to the box. It converts the box&apos;s state to a loading state.
+ *
+ * @type plugin
+ * @usage $(&quot;#box-widget&quot;).boxRefresh( options );
+ */
+(function ($) {
+
+  $.fn.boxRefresh = function (options) {
+
+    // Render options
+    var settings = $.extend({
+      //Refresh button selector
+      trigger: &quot;.refresh-btn&quot;,
+      //File source to be loaded (e.g: ajax/src.php)
+      source: &quot;&quot;,
+      //Callbacks
+      onLoadStart: function (box) {
+      }, //Right after the button has been clicked
+      onLoadDone: function (box) {
+      } //When the source has been loaded
+
+    }, options);
+
+    //The overlay
+    var overlay = $(&apos;&lt;div class=&quot;overlay&quot;&gt;&lt;div class=&quot;fa fa-refresh fa-spin&quot;&gt;&lt;/div&gt;&lt;/div&gt;&apos;);
+
+    return this.each(function () {
+      //if a source is specified
+      if (settings.source === &quot;&quot;) {
+        if (console) {
+          console.log(&quot;Please specify a source first - boxRefresh()&quot;);
+        }
+        return;
+      }
+      //the box
+      var box = $(this);
+      //the button
+      var rBtn = box.find(settings.trigger).first();
+
+      //On trigger click
+      rBtn.on(&apos;click&apos;, function (e) {
+        e.preventDefault();
+        //Add loading overlay
+        start(box);
+
+        //Perform ajax call
+        box.find(&quot;.box-body&quot;).load(settings.source, function () {
+          done(box);
+        });
+      });
+    });
+
+    function start(box) {
+      //Add overlay and loading img
+      box.append(overlay);
+
+      settings.onLoadStart.call(box);
+    }
+
+    function done(box) {
+      //Remove overlay and loading img
+      box.find(overlay).remove();
+
+      settings.onLoadDone.call(box);
+    }
+
+  };
+
+})(jQuery);
+
+/*
+ * TODO LIST CUSTOM PLUGIN
+ * -----------------------
+ * This plugin depends on iCheck plugin for checkbox and radio inputs
+ *
+ * @type plugin
+ * @usage $(&quot;#todo-widget&quot;).todolist( options );
+ */
+(function ($) {
+
+  $.fn.todolist = function (options) {
+    // Render options
+    var settings = $.extend({
+      //When the user checks the input
+      onCheck: function (ele) {
+      },
+      //When the user unchecks the input
+      onUncheck: function (ele) {
+      }
+    }, options);
+
+    return this.each(function () {
+
+      if (typeof $.fn.iCheck != &apos;undefined&apos;) {
+        $(&apos;input&apos;, this).on(&apos;ifChecked&apos;, function (event) {
+          var ele = $(this).parents(&quot;li&quot;).first();
+          ele.toggleClass(&quot;done&quot;);
+          settings.onCheck.call(ele);
+        });
+
+        $(&apos;input&apos;, this).on(&apos;ifUnchecked&apos;, function (event) {
+          var ele = $(this).parents(&quot;li&quot;).first();
+          ele.toggleClass(&quot;done&quot;);
+          settings.onUncheck.call(ele);
+        });
+      } else {
+        $(&apos;input&apos;, this).on(&apos;change&apos;, function (event) {
+          var ele = $(this).parents(&quot;li&quot;).first();
+          ele.toggleClass(&quot;done&quot;);
+          settings.onCheck.call(ele);
+        });
+      }
+    });
+  };
+}(jQuery));
+</code></pre>
+</div>
+
+<footer class="footer">
+  Generated by <a href="https://esdoc.org">ESDoc<span data-ice="esdocVersion">(0.2.4)</span></a>
+</footer>
+
+<script src="script/search_index.js"></script>
+<script src="script/search.js"></script>
+<script src="script/pretty-print.js"></script>
+<script src="script/inherited-summary.js"></script>
+<script src="script/test-summary.js"></script>
+<script src="script/inner-link.js"></script>
+<script src="script/patch-for-local.js"></script>
+</body>
+</html>

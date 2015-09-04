@@ -37,16 +37,6 @@ var AppStore = assign({}, EventEmitter.prototype, {
 AppDispatcher.register(function(action) {
 
   switch(action.actionType) {
-    case ActionType.APP_HEIGHT_CHANGE:
-      _app_data.height = action.height;      
-      AppStore.emitChange(AppStore.HEIGHT_CHANGE_EVENT);
-      break;
-
-    case ActionType.APP_VIEW_CHANGE:
-      _app_data.view_name = action.view_name;      
-      AppStore.emitChange(AppStore.VIEW_CHANGE_EVENT);
-      break;
-
     default:
       // no op
   }
