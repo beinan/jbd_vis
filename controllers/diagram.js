@@ -24,7 +24,7 @@ exports.getMethodInvocationInfo = function(req, res){
   var from_lifeline_data = from_lifeline_id.split(':');
   Promise.all(
     [
-      getOutSignals(from_lifeline_id),
+      queryOutSignals(from_lifeline_id),
       getParams(from_lifeline_data[0], from_lifeline_data[3], from_lifeline_data[4])
     ]).then(function(data){
     res.json(
@@ -36,9 +36,27 @@ exports.getMethodInvocationInfo = function(req, res){
   });
 };
 
-function getOutSignals(from_lifeline_id){
+function queryOutSignals(from_lifeline_id){
   return new Promise(function(resolve, reject){
     Signal.find({from_id: from_lifeline_id}).sort({seq:1}).exec(function(err, docs){
+      if(err)
+        return reject(err);
+      return resolve(docs);
+    });
+  });
+
+}
+
+exports.getNextSignals = function(req, res){
+  var start_seq = req.query.start_seq;
+  queryNextSignals(start_seq).then(res.json.bind(res))
+    .catch((e) => res.status(500).json(e));
+};
+
+function queryNextSignals(seq){
+  return new Promise(function(resolve, reject){
+    Signal.find({seq: {$gt: seq}}).sort({seq:1}).exec(function(err, docs){
+      console.log("signals", docs);
       if(err)
         return reject(err);
       return resolve(docs);

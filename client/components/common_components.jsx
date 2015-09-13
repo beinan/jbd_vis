@@ -1,9 +1,7 @@
 
 import React from 'react/addons'  //react with all addons
 
-import JobStore from '../stores/job_store'
 
-import StoreFactory from '../stores/store_factory'
 
 /**
  * Common abstracted React.js component with PureRenderMixin
@@ -15,6 +13,7 @@ export class ImmutablePropComponent extends React.Component{
   constructor(props) {
     super(props);
     this.shouldComponentUpdate = React.addons.PureRenderMixin.shouldComponentUpdate.bind(this);
+    console.log("construct componet:", this.constructor.name);
   }
 } 
 
@@ -22,28 +21,43 @@ export class ImmutablePropComponent extends React.Component{
  * Common abstracted cmponent with a common store {@link StoreFactory}
  * store in props is mandatory
  * @example 
- * class MyComponent extends PureRenderCommponent{
+ * class MyComponent extends PureRenderComponent{
  *  ...
  * }
  * <MyComponent store={StoreFactory.getAppStore()} />
  */
-export class PureRenderCommponent extends ImmutablePropComponent{
+export class PureRenderComponent extends ImmutablePropComponent{
   constructor(props) {
     super(props);
     this.state = {data : props.store.getData()};
     this._onChange = this._onChange.bind(this);
+    this.componentDidMount = this.componentDidMount.bind(this);
+    this.componentWillUnmount = this.componentWillUnmount.bind(this);
+    //this.componentWillReceiveProps = this.componentWillReceiveProps.bind(this);
   }
 
   componentDidMount() {
+    //console.log("component did mount:", this.constructor.name, this.props.store); 
     this.props.store.addEventListener(this._onChange);
   }
 
   componentWillUnmount() {
+    //console.log("component will unmount:", this.constructor.name, this.props.store); 
     this.props.store.removeEventListener(this._onChange);
   }
+  
+  //componentWillReceiveProps(nextProps){
+    //this.setState({data:nextProps.store.getData()});
+  //}
 
   _onChange() {
-    this.setState({data:this.props.store.getData()});
+    try{
+      //console.log("setting state start", this.constructor.name);
+      this.setState({data:this.props.store.getData()});
+      //console.log("setting state finished",  this.constructor.name);
+    }catch(e){
+      console.error("setState exception", e, e.stack);
+    }
   }
 }
 

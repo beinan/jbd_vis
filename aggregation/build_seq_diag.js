@@ -1,15 +1,16 @@
 var mongoose = require('mongoose');
 
 var Promise = require('es6-promise').Promise;
+var assign = require('object-assign');
 
 var Trace = require('../models/Trace.js');
 var Actor = require('../models/Actor.js');
 var Lifeline = require('../models/Lifeline.js');
 var Signal = require('../models/Signal.js');
 
-var assign = require('object-assign');
+var SeqBuilder = require('../models/SeqBuilder.js');
 
-var top_sort = require('./signal_top_sort').signalTopSort;
+
 
 //es6 promise wrapper for mongoose query
 function promise_wrapper(mongoose_query){
@@ -58,12 +59,24 @@ exports.createSeqDiagram = function(jvm_name, selected_classes){
     };
   });
 }
+
 exports.buildActorAndSignals = function(jvm_name, selected_classes){
-  var q = {jvm_name : jvm_name, msg_type:'method_enter'};
-  q['$or'] = selected_classes.map(function(class_name){
+  //console.log(SeqBuilder.createBuilder);
+  return SeqBuilder.createBuilder(jvm_name).then(function(builder){
+    console.log(builder);
+    if(builder.status == "processing")
+      throw "Builder is processing. Please wait.";
+    //console.log("startBuilding function", builder.startBuilding);
+    return builder.startBuilding(selected_classes, naive_build);
+  });
+
+};
+
+function naive_build(builder){
+  var q = {jvm_name : builder.jvm_name, msg_type:'method_enter'};
+  q['$or'] = builder.selected_classes.map(function(class_name){
     return {method_desc: {$regex: "^"+class_name}};  //select by class name
   });
-  console.log(q);
   var stream = Trace.find(q).stream();
   var counter = 0;
   var promise = new Promise(
@@ -75,7 +88,7 @@ exports.buildActorAndSignals = function(jvm_name, selected_classes){
         var data = parsingTraceData(doc);
         //console.log(data);
         var self = this;
-        createActorAndLifeline(data).then(function(p){
+        Actor.createActorAndLifeline(data).then(function(p){
           //console.log("promise return", p);
           var from_actor = p[0];
           var from_lifeline = p[1];
@@ -87,10 +100,11 @@ exports.buildActorAndSignals = function(jvm_name, selected_classes){
           console.log(err);
         });
       }).on('error', function (err) {
-        console.log("error during build actor and signals streaming", err);{ multi: true }
+        console.log("error during build actor and signals streaming", err);
         reject(err);
       }).on('close', function () {
-        top_sort(jvm_name).then(function(){
+        var top_sort = require('../aggregation/signal_top_sort').signalTopSort;
+        top_sort(this.jvm_name).then(function(){
           resolve(counter);        
         });
       });
@@ -100,23 +114,14 @@ exports.buildActorAndSignals = function(jvm_name, selected_classes){
   return promise;
 };
 
-function createActorAndLifeline(data){
-  var actor_id = data.jvm_name + ":" + data.owner;
-  if(data.owner_ref)
-    actor_id = actor_id + ":" + data.owner_ref;
-  else
-    actor_id = actor_id + ":" + "static";
-  //duplicated actor will be merged
-  var new_actor = {jvm_name: data.jvm_name, owner: data.owner, owner_ref: data.owner_ref};
-  var a_p = Actor.findOneAndUpdate({_id:actor_id}, {$set: new_actor}, {upsert:true, new:true})
-    .exec();
-  //create a lifeline for this method enry
-  //duplicated lifeiline will be merged
-  var lifeline_id = actor_id+ ":" + data.thread_id + ":" +  data.invocation_id;
-  var new_lifeline = {method_name: data.method, thread_id:data.thread_id, invocation_id: data.invocation_id };
-  var l_p = Lifeline.findOneAndUpdate({_id:lifeline_id}, {$set: new_lifeline}, {upsert:true, new:true})
-    .exec();
-  return Promise.all([a_p, l_p]);
+function parsingTraceData(trace_doc){
+  //console.log(trace_doc);
+  var method_descs = trace_doc.method_desc.split('#');
+  var more = {};
+  more.owner = method_descs[0];
+  more.method = method_descs[1].split('(')[0] + "()";
+  //console.log(more);
+  return assign(more, trace_doc._doc);
 }
 
 
@@ -185,12 +190,3 @@ function createOutSignals(from_actor, from_lifeline) {
 
 
 
-function parsingTraceData(trace_doc){
-  //console.log(trace_doc);
-  var method_descs = trace_doc.method_desc.split('#');
-  var more = {};
-  more.owner = method_descs[0];
-  more.method = method_descs[1].split('(')[0] + "()";
-  //console.log(more);
-  return assign(more, trace_doc._doc);
-}

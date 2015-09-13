@@ -8,7 +8,12 @@ module.exports = keyMirror({
   APP_HEIGHT_CHANGE: null,
   APP_VIEW_CHANGE: null,
   QUERY_JVMS: null,
+  SELECT_CLASS:null,
+  START_BUILD:null,
+  FINISH_BUILD:null,
   START_SIMULATION: null,
   ACTOR_DID_MOUNTED: null,
-  REPLAY_JUMP_TO: null
+  THREAD_RECT_DID_MOUNTED: null,
+  REPLAY_JUMP_TO: null,
+  REPLAY_START: null
 });

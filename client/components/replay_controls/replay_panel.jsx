@@ -1,40 +1,39 @@
 import React from 'react'
 
 import SimulationStore from '../../stores/simulation_store';
+import {PureRenderComponent, ImmutablePropComponent} from '../common_components.jsx'
 
 
 
 
-class ReplayPanel extends React.Component{
+class ReplayPanel extends PureRenderComponent{
   
     
   constructor(props){
     super(props);
     
     this._onChange = this._onChange.bind(this);
-    this.seq_diag_store = SimulationStore.getData().seq_diagrams[this.props.jvm_name];
+    //this.seq_diag_store = SimulationStore.getData().seq_diagrams[this.props.jvm_name];
     //current replay signal in seq diagram is a method invocation 
-    this.state = {current_method: this.seq_diag_store.curr_replay_signal};  
-    this.replay_store = this.seq_diag_store.replay_store;
+    //this.state = {current_method: this.seq_diag_store.curr_replay_signal};  
+    //this.replay_store = this.seq_diag_store.replay_store;
   }
   
-  componentDidMount(){
-    this.seq_diag_store.addReplayEventListener(this._onChange);
-    this.replay_store.addUpdateEventListener(this._onChange);
-  }
+  //componentDidMount(){
+    //this.seq_diag_store.addReplayEventListener(this._onChange);
+    //this.replay_store.addUpdateEventListener(this._onChange);
+  //}
 
-  componentWillUnmount() {
-    this.seq_diag_store.removeReplayEventListener(this._onChange);
-    this.replay_store.removeUpdateEventListener(this._onChange);
-  }
+  //componentWillUnmount() {
+    //this.seq_diag_store.removeReplayEventListener(this._onChange);
+    //this.replay_store.removeUpdateEventListener(this._onChange);
+  //}
 
-  _onChange() {
-    this.setState({current_method: this.seq_diag_store.curr_replay_signal, method_invocation_data: this.replay_store.data});
-  }
+  //_onChange() {
+    //this.setState({current_method: this.seq_diag_store.curr_replay_signal, method_invocation_data: this.replay_store.data});
+  //}
 
   render(){
-    if(!this.state.current_method)
-      return null;
     console.log("ReplayPanel is rendering", this.props, this.state);
     var signal_messages = [];
     if(this.state.method_invocation_data){
@@ -81,7 +80,7 @@ class ReplayPanel extends React.Component{
         <ul className="timeline">
           <li className="time-label">
             <span className="bg-red">
-            {this.state.current_method.to_lifeline.method_name}
+            {this.state.data.get('tick')}
             </span>
           </li>
           {timeline_nodes}

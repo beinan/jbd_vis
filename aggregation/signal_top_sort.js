@@ -7,7 +7,7 @@ var Signal = require('../models/Signal.js');
 exports.signalTopSort = function(jvm_name){
   return buildEdges(jvm_name).then(function(count){
     var p = new Promise(function(resolve, reject){
-      topSortReduce(resolve, reject, 0);       
+      topSortReduce(jvm_name, resolve, reject, 0);       
       //resolve(count);
     });
     return p.then(
@@ -18,9 +18,9 @@ exports.signalTopSort = function(jvm_name){
   });
 };
 
-function topSortReduce(resolve, reject, count){
+function topSortReduce(jvm_name, resolve, reject, count){
   console.log("top sort reduce:", count);
-  Signal.findOneAndUpdate({incomming_edges:[], seq:{$exists:false}}, {$set: {seq: count + 1}}).exec(
+  Signal.findOneAndUpdate({jvm_name: jvm_name, incomming_edges:[], seq:{$exists:false}}, {$set: {seq: count + 1}}).exec(
     function(err,doc){
       if(doc){
         Signal.update({incomming_edges: doc._id}, {$pull: {incomming_edges: doc._id}}, { multi: true })

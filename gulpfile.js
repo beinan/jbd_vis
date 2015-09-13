@@ -15,20 +15,19 @@ var path = require('path');
 
 var babelify = require('babelify');
 // add custom browserify options here
-var customOpts = {
-  entries: ['./client/app.js'],
-  debug: true
-};
-var opts = assign({}, watchify.args, customOpts);
-var b = watchify(browserify(opts)); 
-b.transform(babelify);
 
-gulp.task('js', bundle); // so you can run `gulp js` to build the file
-b.on('update', bundle); // on any dep update, runs the bundler
-b.on('log', gutil.log); // output build logs to terminal
-
-function bundle() {
-  return b.bundle()
+gulp.task('client_js', function(){
+  var customOpts = {
+    entries: ['./client/app.js'],
+    debug: true
+  };
+  var opts = assign({}, watchify.args, customOpts);
+  var b = watchify(browserify(opts)); 
+  b.transform(babelify);
+  
+  //define bundle function
+  var bundle = function(){
+    return b.bundle()
     // log errors if they happen
     .on('error', function(err) {console.log(err.toString(),"\n",err.codeFrame);})
     .pipe(source('application.js'))
@@ -39,13 +38,35 @@ function bundle() {
        // Add transformation tasks to the pipeline here.
     //.pipe(sourcemaps.write('./')) // writes .map file   
     .pipe(gulp.dest('./public/js'));
-}
+  };
 
-gulp.task("watch", function(){
-  var nodemon = require('gulp-nodemon');
-  nodemon({script:'./app', ext:"js"});
+  b.on('update', bundle); // on any dep update, runs the bundler
+  b.on('log', gutil.log); // output build logs to terminal
+  
+  bundle();  //do bundle
+  
+}); // so you can run `gulp client_js` to build the file
+
+
+var spawn = require('child_process').spawn,
+    node;
+gulp.task("server", function(){
+  if (node) 
+    node.kill();
+  node = spawn('node', ['--harmony', 'app.js'], {stdio: 'inherit'});
+  node.on('close', function (code) {
+    if (code === 8) {
+      gulp.log('Error detected, waiting for changes...');
+    }
+  });
 });
-gulp.task("default", ["less", "js","watch"]);
+
+gulp.task("default", ["less", "client_js","server"], function(){
+  gulp.watch(['./app.js', './controllers/**/*.js', './models/**/*.js', './aggregation/**/*.js'], function() {
+    gulp.run('server');
+  });
+
+});
 
 
 gulp.task('less', function () {

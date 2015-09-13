@@ -1,41 +1,29 @@
 import React from 'react'
 
-import SimulationStore from '../../stores/simulation_store';
-import JvmsAction from '../../actions/jvm_action';
-import {ContentSection, ContentBox, UploadFileForm} from '../common_components.jsx';
 
 import {Button, Input, Label, Fade, Collapse,Badge, Grid, Row, Col, Well} from 'react-bootstrap';
 
+import {ImmutablePropComponent, PureRenderComponent, ContentBox} from '../common_components.jsx';
+
 import SeqDiagram from '../seq_diagram/seq_diagram.jsx'
 
-class SimulationView extends React.Component{
+import StoreFactory from '../../stores/store_factory';
+
+export default class SimulationView extends React.Component{
   
   constructor(props){
     super(props);
-    this.state = SimulationStore.getData();
-    this._onChange = this._onChange.bind(this);
-  }
-  
-  componentDidMount() {
-    SimulationStore.addUpdateEventListener(this._onChange);
-  }
-
-  componentWillUnmount() {
-    SimulationStore.removeUpdateEventListener(this._onChange);
-  }
-
-  _onChange() {
-    this.setState(SimulationStore.getData());
   }
 
  
   render(){
-    console.log("rendering simulation_view", this.state);
-    var seq_diagrams = [];
-    for(var jvm_name in this.state.seq_diagrams){
-      console.log(jvm_name, this.state.seq_diagrams[jvm_name]);
-      seq_diagrams.push(<SeqDiagram key={"seq_diag_" + jvm_name} title={jvm_name} seq_data ={ this.state.seq_diagrams[jvm_name]} />);
-    }
+    console.log("rendering simulation_view", this.props);
+    var jvm_id = this.props.jvm_id;
+    console.log(jvm_id,  StoreFactory.getJvmProcessListStore().getJvm(jvm_id));
+    var seq_store = StoreFactory.getJvmProcessListStore().getJvm(jvm_id).getSeqDiagram();
+    var seq_diagram = (
+      <SeqDiagram jvm_id={jvm_id} store ={seq_store} />
+    )
     return (
       <div>
         {/*header*/}
@@ -52,7 +40,7 @@ class SimulationView extends React.Component{
         {/*content*/}
         <div className="content body">
           <div className="row" style={{overflow:'auto'}}>
-            {seq_diagrams}
+            {seq_diagram}
           </div>
           
         </div>
@@ -61,5 +49,3 @@ class SimulationView extends React.Component{
   }
 
 }
-
-export default SimulationView;

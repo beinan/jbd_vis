@@ -10,6 +10,7 @@ exports.buildSeqDiag = function(req, res){
       res.json({status:"finished", count: count});
     }    
   ).catch(function(err){
+    console.log(err);
     res.status(500).json(err);
   });  
   

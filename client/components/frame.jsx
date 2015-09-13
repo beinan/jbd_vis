@@ -4,7 +4,9 @@ import React from 'react';
 
 import JvmListDrowDown from './replay_controls/jvm_list_drowdown.jsx'
 
-import {PureRenderCommponent, ImmutablePropComponent} from './common_components.jsx'
+import {PureRenderComponent, ImmutablePropComponent} from './common_components.jsx'
+
+import StoreFactory from '../stores/store_factory'
 
 class TopNavBar extends React.Component{
   constructor(props){
@@ -23,7 +25,7 @@ class TopNavBar extends React.Component{
         </a>
         <div className="navbar-custom-menu">
           <ul className="nav navbar-nav">
-            <JvmListDrowDown />
+            <JvmListDrowDown store={StoreFactory.getJvmProcessListStore()} />
             <li>
               <a href="#" onClick={()=>$(".control-sidebar").toggleClass("control-sidebar-open")}><i className="fa fa-gears"></i></a>
             </li>
@@ -52,7 +54,7 @@ import MainSideBar from './main_side_bar.jsx'
 import ContentWrapper from './content_wrapper.jsx'
 import ControlSideBar from './replay_controls/control_side_bar.jsx'
 
-class Frame extends PureRenderCommponent{
+class Frame extends PureRenderComponent{
   constructor(props) {
     super(props);
   }
@@ -62,8 +64,8 @@ class Frame extends PureRenderCommponent{
       <div className="wrapper" style={{height:this.state.data.get("height"), overflowY:'auto'}}>
         <Header/>
         <MainSideBar view_name = {this.state.data.get("view_name")}/>
-        <ContentWrapper view_name = {this.state.data.get("view_name")}/>
-        <ControlSideBar/>
+        <ContentWrapper view_name = {this.state.data.get("view_name")} params={this.state.data.get("view_params")}/>
+        <ControlSideBar store={StoreFactory.getSimulationListStore()}/>
       </div>
     );
   }

@@ -4,43 +4,39 @@ import SimulationStore from '../../stores/simulation_store';
 
 
 import {Accordion, Panel} from 'react-bootstrap';
+import SimulationAction from '../../actions/simulation_action';
 
 import ReplayPanel from './replay_panel.jsx'
+import {PureRenderComponent, ImmutablePropComponent} from '../common_components.jsx'
 
-class ControlSideBar extends React.Component{
+
+class ControlSideBar extends PureRenderComponent{
   
     
   constructor(props){
     super(props);
-    this.state = {width:200, active_jvm_name: SimulationStore.getData().active_jvm_name};
-    this._onChange = this._onChange.bind(this);
   }
   
-  componentDidMount() {
-    SimulationStore.addUpdateEventListener(this._onChange);
-  }
-
-  componentWillUnmount() {
-    SimulationStore.removeUpdateEventListener(this._onChange);
-  }
-
-  _onChange() {
-    this.setState({active_jvm_name: SimulationStore.getData().active_jvm_name});
+  
+  replayStartOnClick(e){
+    console.log("replay start on click");
+    e.preventDefault();
+    SimulationAction.replayStart();
   }
 
   render(){
-    console.log("control_side_bar is rendering", this.props, this.state, SimulationStore.getData());
+    console.log("control_side_bar is rendering", this.props, this.state);
+    var active_jvm_id = this.state.data.get("active_jvm_id");
     var replay_panel;
-    if(this.state.active_jvm_name){
-      replay_panel = <ReplayPanel jvm_name={this.state.active_jvm_name}/>
+    if(active_jvm_id){
+      replay_panel = <ReplayPanel store = {this.state.data.get("simulation_map").get(active_jvm_id)}/>
     }
     return(
-      <aside className="control-sidebar control-sidebar-light" style={{position:"fixed", bottom:10, overflowY:'auto', width: this.state.width}}>
+      <aside className="control-sidebar control-sidebar-light" 
+             style={{position:"fixed", bottom:10, overflowY:'auto', width: this.state.data.get("width", 200)}}>
         <ul className="nav nav-tabs nav-justified control-sidebar-tabs">
-          <li><a href="#" onClick={()=>this.setState({width: this.state.width+150})}><i className="fa fa-expand"></i></a></li>
-          <li><a href="#" onClick={()=>this.setState({width: this.state.width-150})}><i className="fa fa-compress"></i></a></li>          
-          <li><a href="#" data-toggle="tab"><i className="fa fa-step-backward"></i></a></li>
-          <li><a href="#" data-toggle="tab"><i className="fa fa-play-circle"></i></a></li>
+          <li><a href="#" data-toggle="tab" ><i className="fa fa-step-backward"></i></a></li>
+          <li><a href="#" data-toggle="tab" onClick={this.replayStartOnClick}><i className="fa fa-play-circle"></i></a></li>
           <li><a href="#" data-toggle="tab"><i className="fa fa-step-forward"></i></a></li>
           <li><a href="#" data-toggle="tab"><i className="fa fa-pause"></i></a></li>          
                 

@@ -10,10 +10,12 @@ class AppAction {
     });
   }
 
-  setView(view_name){
+  setView(view_name, params){
+    console.log("set view", view_name, params);
     AppDispatcher.dispatch({
       actionType: ActionType.APP_VIEW_CHANGE,
-      view_name: view_name
+      view_name: view_name,
+      params: params
     });
   }
 }

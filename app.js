@@ -43,6 +43,7 @@ app.get('/api/methods_meta/:jvm_id', trace.getMethodMeta);
 app.post('/api/build_seq_diag/', trace.buildSeqDiag);
 app.post('/api/get_seq_diag/', diagram.getSeqDiag);
 app.get('/api/get_method_invocation_info/', diagram.getMethodInvocationInfo);
+app.get('/api/get_next_signals/', diagram.getNextSignals);
 app.get('/api/parse_java/', java_source.parse);
 
 
