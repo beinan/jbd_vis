@@ -19,6 +19,7 @@ export class SimulationListStore extends CommonStore{
     super({simulation_map: Immutable.Map()});    
     var this_store = this;
     AppDispatcher.register(function(action) {
+      var sim_store;
       switch(action.actionType) {
       case ActionType.START_SIMULATION:
         console.log("active simulation chaged", action.jvm_id);
@@ -31,8 +32,14 @@ export class SimulationListStore extends CommonStore{
         
       case ActionType.REPLAY_START:
         //_data.seq_diagrams[action.signal.jvm_name].replayJumpTo(action.signal);
-        var sim_store = this_store.get('simulation_map').get(this_store.get('active_jvm_id'));
+        sim_store = this_store.get('simulation_map').get(this_store.get('active_jvm_id'));
         sim_store.replayStart();
+        break;
+      
+      case ActionType.REPLAY_PAUSE:
+        //_data.seq_diagrams[action.signal.jvm_name].replayJumpTo(action.signal);
+        sim_store = this_store.get('simulation_map').get(this_store.get('active_jvm_id'));
+        sim_store.replayPause();
         break;
 
       case ActionType.REPLAY_JUMP_TO:
@@ -79,10 +86,15 @@ export class SimulationStore extends CommonStore{
   }
 
   replayStart(){
-    var this_store = this;
     if(this.interval_var)
       clearInterval(this.interval_var);
-    this.interval_var = setInterval(this.tick.bind(this), this_store.get("interval", 300));
+    this.interval_var = setInterval(this.tick.bind(this), this.get("interval", 300));
+    
+  }
+
+  replayPause(){
+    if(this.interval_var)
+      clearInterval(this.interval_var);
     
   }
 };

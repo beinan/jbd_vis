@@ -36,6 +36,12 @@ class SimulationAction {
       actionType: ActionType.REPLAY_START
     });
   }
+  
+  replayPause(){
+    AppDispatcher.dispatch({
+      actionType: ActionType.REPLAY_PAUSE
+    });
+  }
   replayJumpTo(signal){
     console.log("replay jump to:", signal);
     AppDispatcher.dispatch({

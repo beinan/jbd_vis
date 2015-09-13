@@ -15,5 +15,6 @@ module.exports = keyMirror({
   ACTOR_DID_MOUNTED: null,
   THREAD_RECT_DID_MOUNTED: null,
   REPLAY_JUMP_TO: null,
-  REPLAY_START: null
+  REPLAY_START: null,
+  REPLAY_PAUSE: null
 });

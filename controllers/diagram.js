@@ -56,7 +56,7 @@ exports.getNextSignals = function(req, res){
 function queryNextSignals(seq){
   return new Promise(function(resolve, reject){
     Signal.find({seq: {$gt: seq}}).sort({seq:1}).exec(function(err, docs){
-      console.log("signals", docs);
+      //oconsole.log("signals", docs);
       if(err)
         return reject(err);
       return resolve(docs);

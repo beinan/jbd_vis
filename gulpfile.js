@@ -27,7 +27,7 @@ gulp.task('client_js', function(){
   
   //define bundle function
   var bundle = function(){
-    return b.bundle()
+    b.bundle()
     // log errors if they happen
     .on('error', function(err) {console.log(err.toString(),"\n",err.codeFrame);})
     .pipe(source('application.js'))
@@ -38,6 +38,7 @@ gulp.task('client_js', function(){
        // Add transformation tasks to the pipeline here.
     //.pipe(sourcemaps.write('./')) // writes .map file   
     .pipe(gulp.dest('./public/js'));
+    console.log("Client side js is ready!");
   };
 
   b.on('update', bundle); // on any dep update, runs the bundler

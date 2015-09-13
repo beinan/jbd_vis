@@ -24,6 +24,12 @@ class ControlSideBar extends PureRenderComponent{
     SimulationAction.replayStart();
   }
 
+  replayPauseOnClick(e){
+    console.log("replay pause on click");
+    e.preventDefault();
+    SimulationAction.replayPause();
+  }
+
   render(){
     console.log("control_side_bar is rendering", this.props, this.state);
     var active_jvm_id = this.state.data.get("active_jvm_id");
@@ -38,7 +44,7 @@ class ControlSideBar extends PureRenderComponent{
           <li><a href="#" data-toggle="tab" ><i className="fa fa-step-backward"></i></a></li>
           <li><a href="#" data-toggle="tab" onClick={this.replayStartOnClick}><i className="fa fa-play-circle"></i></a></li>
           <li><a href="#" data-toggle="tab"><i className="fa fa-step-forward"></i></a></li>
-          <li><a href="#" data-toggle="tab"><i className="fa fa-pause"></i></a></li>          
+          <li><a href="#" data-toggle="tab" onClick={this.replayPauseOnClick}><i className="fa fa-pause"></i></a></li>          
                 
         </ul>
         
