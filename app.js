@@ -6,6 +6,7 @@ var connectAssets = require('connect-assets');
 var logger = require('morgan');
 var bodyParser = require('body-parser');
 
+var multer  = require('multer');
 
 var app = express();
 
@@ -46,6 +47,8 @@ app.get('/api/get_method_invocation_info/', diagram.getMethodInvocationInfo);
 app.get('/api/get_next_signals/', diagram.getNextSignals);
 app.get('/api/parse_java/', java_source.parse);
 
+
+app.post('/upload', java_source.upload);
 
 /**
  * Start Express server.

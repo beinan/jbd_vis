@@ -5,7 +5,7 @@ import JvmsAction from '../../actions/jvm_action';
 
 import ViewType from '../../view_type';
 
-import {ImmutablePropComponent, PureRenderComponent, ContentBox} from '../common_components.jsx';
+import {ImmutablePropComponent, PureRenderComponent, ContentBox, UploadFileForm} from '../common_components.jsx';
 
 import {Button, Input, Label, Fade, Collapse,Badge, Grid, Row, Col, Well} from 'react-bootstrap';
 
@@ -160,9 +160,12 @@ class JvmsView extends ImmutablePropComponent{
           <div className="row" >
             <JvmListBox store={StoreFactory.getJvmProcessListStore()}/>           
           </div>
+          <div className="row" >
+            <UploadFileForm url="/upload" title="Upload Java source files or jars" dese="" />           
+          </div>
           
         </div>
-      </div>
+      x</div>
     )
   }
 

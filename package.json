@@ -29,6 +29,7 @@
     "keymirror": "^0.1.1",
     "mongoose": "^4.0.8",
     "morgan": "^1.6.1",
+    "multer": "^1.0.3",
     "object-assign": "^3.0.0",
     "react": "^0.13.3",
     "react-bootstrap": "^0.25.1",
