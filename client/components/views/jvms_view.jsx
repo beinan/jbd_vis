@@ -86,7 +86,7 @@ class JvmEntry extends PureRenderComponent{
     console.log("rendering jvm entry", this.state);
     return (
       <li>
-        {this.state.data.get('_id')}
+        {this.state.data.get('main_class', this.state.data.get('_id'))}
         <Badge>{this.state.data.get("value").count}</Badge>
         <div className="pull-right">
           <Button bsStyle="warning" bsSize='xsmall'  onClick={this._onClickWatchFilterButton}>Watch Filter</Button>

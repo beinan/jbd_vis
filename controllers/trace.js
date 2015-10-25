@@ -43,10 +43,31 @@ exports.getJvms = function(req, res) {
     //query: query, // filter conditions
     //out: {inline: 1}  // doesn't create a new collection, includes the result in the output obtained
   };
-
+  
+  var checkForHexRegExp = new RegExp("^[0-9a-fA-F]{24}$");
   // execute map-reduce command
   Trace.mapReduce(command, function(err, dbres) {
-    res.json(dbres);
+    
+    var ids = dbres.map(function(jvm){
+      return jvm._id;
+      
+    }).filter(function(id){
+      return id.length == 24 && checkForHexRegExp.test(id);
+    });
+    var JvmProcess = require('../models/JvmProcess');
+    JvmProcess.find({'_id': {$in: ids}}, function(err, jvms){
+      console.log("jvms", err, jvms);
+      jvms.forEach(function(jvm){
+        dbres.forEach(function(res){
+          if(jvm._id == res._id){
+            res.main_class = jvm.main_class;
+            res.user_app = jvm.user_app; 
+          }
+        });
+      });
+      res.json(dbres);
+    });
+    ;
   });
 };
 
