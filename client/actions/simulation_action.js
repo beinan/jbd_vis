@@ -31,6 +31,21 @@ class SimulationAction {
     });
   }
   
+  activeLifeline(lifeline_id){
+    AppDispatcher.dispatch({
+      actionType: ActionType.ACTIVE_LIFELINE,
+      lifeline_id : lifeline_id
+    });
+ 
+  }
+
+  addOutSignal(signal){
+    AppDispatcher.dispatch({
+      actionType: ActionType.ADD_OUT_SIGNAL,
+      signal:signal
+    });
+  }
+
   replayStart(){
     AppDispatcher.dispatch({
       actionType: ActionType.REPLAY_START
@@ -42,11 +57,17 @@ class SimulationAction {
       actionType: ActionType.REPLAY_PAUSE
     });
   }
-  replayJumpTo(signal){
-    console.log("replay jump to:", signal);
+  replayJumpTo(seq){
+    //console.log("replay jump to:", signal);
     AppDispatcher.dispatch({
       actionType: ActionType.REPLAY_JUMP_TO,
-      signal: signal
+      seq: seq
+    });
+  }
+  replayStepForward(step_length){
+    AppDispatcher.dispatch({
+      actionType: ActionType.REPLAY_STEP_FORWORD,
+      step_length: step_length
     });
   }
 }

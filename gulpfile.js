@@ -63,7 +63,7 @@ gulp.task("server", function(){
 });
 
 gulp.task("default", ["less", "client_js","server"], function(){
-  gulp.watch(['./app.js', './controllers/**/*.js', './models/**/*.js', './aggregation/**/*.js'], function() {
+  gulp.watch(['./app.js', './controllers/**/*.js', './models/**/*.js', './aggregation/**/*.js', './utils/**/*.js'], function() {
     gulp.run('server');
   });
 

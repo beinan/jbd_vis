@@ -5,6 +5,9 @@ import Signal from './signal.jsx'
 import Lifeline from './lifeline.jsx'
 import {ImmutablePropComponent, PureRenderComponent, ContentBox} from '../common_components.jsx';
 
+import SimulationBar from '../replay_controls/simulation_bar.jsx'
+import StoreFactory from '../../stores/store_factory'
+
 export default class SeqDiagram extends PureRenderComponent{
   constructor(props){
     super(props);
@@ -30,7 +33,9 @@ export default class SeqDiagram extends PureRenderComponent{
       signals = this.state.data.get("signal_map").toArray().map(
         (signal_store) => {
           //console.log("signal store", signal_store);
-          return <Signal key={"signal_" + signal_store.get("_id")} jvm_id={this.props.jvm_id} store={signal_store} /> 
+          return <Signal key={"signal_" + signal_store.get("_id")} 
+                           max_width = {this.state.data.get("width")}
+                           jvm_id={this.props.jvm_id} store={signal_store} /> 
         }
       )
       lifelines = this.state.data.get("lifeline_map").toArray().map(
@@ -48,6 +53,10 @@ export default class SeqDiagram extends PureRenderComponent{
         {actors}
         {signals}
         {lifelines}
+        <SimulationBar jvm_id={this.props.jvm_id} 
+                       seq_diag_store={this.props.store} 
+                       max_width = {this.state.data.get("width")}
+                       store={StoreFactory.getSimulationListStore().get("simulation_map").get(this.props.jvm_id)}/>
       </svg>
     );
   }

@@ -9,6 +9,7 @@ var Promise = require('es6-promise').Promise;
 
 
 exports.getSeqDiag = function(req, res){
+  console.log(req.body);
   createSeqDiagram(req.body.id, req.body.selected_classes).then(
     function(diagram_data){
       res.json({status:"finished", data:diagram_data});
@@ -49,13 +50,15 @@ function queryOutSignals(from_lifeline_id){
 
 exports.getNextSignals = function(req, res){
   var start_seq = req.query.start_seq;
-  queryNextSignals(start_seq).then(res.json.bind(res))
+  var jvm_id = req.query.jvm_id;
+  console.log("get next signals", jvm_id, start_seq);
+  queryNextSignals(start_seq, jvm_id).then(res.json.bind(res))
     .catch((e) => res.status(500).json(e));
 };
 
-function queryNextSignals(seq){
+function queryNextSignals(seq, jvm_id){
   return new Promise(function(resolve, reject){
-    Signal.find({seq: {$gt: seq}}).sort({seq:1}).exec(function(err, docs){
+    Signal.find({jvm_name: jvm_id, seq: {$gt: seq}}).sort({seq:1}).exec(function(err, docs){
       //oconsole.log("signals", docs);
       if(err)
         return reject(err);

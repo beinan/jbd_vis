@@ -2,6 +2,7 @@ import React from 'react'
 
 import SimulationStore from '../../stores/simulation_store';
 import {PureRenderComponent, ImmutablePropComponent} from '../common_components.jsx'
+import SimulationAction from '../../actions/simulation_action';
 
 
 
@@ -12,13 +13,19 @@ class ReplayPanel extends PureRenderComponent{
   constructor(props){
     super(props);
     
-    this._onChange = this._onChange.bind(this);
+    this.componentDidUpdate = this.componentDidUpdate.bind(this);
+    //this._onChange = this._onChange.bind(this);
     //this.seq_diag_store = SimulationStore.getData().seq_diagrams[this.props.jvm_name];
     //current replay signal in seq diagram is a method invocation 
     //this.state = {current_method: this.seq_diag_store.curr_replay_signal};  
     //this.replay_store = this.seq_diag_store.replay_store;
   }
-  
+  componentDidUpdate(prevProps, prevState){
+    var current_signal = this.props.store.getCurrentSignal();
+    if(current_signal){
+       SimulationAction.activeLifeline(current_signal.from_id);
+    }
+  }
   //componentDidMount(){
     //this.seq_diag_store.addReplayEventListener(this._onChange);
     //this.replay_store.addUpdateEventListener(this._onChange);
@@ -35,6 +42,39 @@ class ReplayPanel extends PureRenderComponent{
 
   render(){
     console.log("ReplayPanel is rendering", this.props, this.state);
+    var current_signal = this.props.store.getCurrentSignal();
+    console.log("current signal", current_signal);
+    var codes, json;
+    if(current_signal){
+      json = (<p>{JSON.stringify(current_signal)}</p>);
+      //SimulationAction.activeLifeline(current_signal.from_id);
+    }
+    if(current_signal && current_signal.line_number){
+      var line = current_signal.line_number;
+      var start = (line - 8 < 0)?0:line - 8;
+      var end = line + 15;
+      var source = this.props.store.get_source(start, end);
+      console.log("source", source);
+      codes = source.map((line, i)=>{
+        var line_number = start + i + 1;
+        if(line_number == current_signal.line_number){
+          var value = "";
+          if(current_signal.field)
+            value = "//{" + current_signal.field + ":" + current_signal.value + "}";
+          return (
+            <pre className="hierarchy bring-up" style={{margin:0, fontSize:10, padding:2}}>
+              <code className="language-java" data-lang="java">{line_number + ":" + line + value}</code>
+            </pre>
+          );
+        }
+        return (
+          <pre style={{margin:0, fontSize:10, padding:2}}>
+            <code className="language-java" data-lang="java" >{line_number + ":" + line }</code>
+          </pre>
+        );
+      });
+    }
+
     var signal_messages = [];
     if(this.state.method_invocation_data){
       signal_messages.push({msg:"parameters passed in:[" + 
@@ -84,6 +124,8 @@ class ReplayPanel extends PureRenderComponent{
             </span>
           </li>
           {timeline_nodes}
+         
+          {codes}
         </ul>
       </div>
       

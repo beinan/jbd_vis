@@ -17,6 +17,9 @@ app.set('view engine', 'jade');
 app.use(logger('dev'));
 
 app.use(bodyParser.json());
+var upload = multer({ dest: 'uploads/' });
+
+
 
 app.use(compress());
 app.use(connectAssets({
@@ -25,7 +28,7 @@ app.use(connectAssets({
 app.use(express.static(path.join(__dirname, 'public'), { maxAge: 31557600000 }));
 
 
-mongoose.connect(process.env.MONGODB || 'mongodb://localhost:27017/jbd');
+mongoose.connect(process.env.MONGODB || 'mongodb://localhost:28888/jbd');
 mongoose.connection.on('error', function() {
   console.error('MongoDB Connection Error. Please make sure that MongoDB is running.');
 });
@@ -45,11 +48,11 @@ app.post('/api/build_seq_diag/', trace.buildSeqDiag);
 app.post('/api/get_seq_diag/', diagram.getSeqDiag);
 app.get('/api/get_method_invocation_info/', diagram.getMethodInvocationInfo);
 app.get('/api/get_next_signals/', diagram.getNextSignals);
-app.get('/api/parse_java/', java_source.parse);
+//app.get('/api/parse_java/', java_source.parse);
 
 
-app.post('/upload', java_source.upload);
-
+app.post('/upload', upload.single('file'), java_source.upload);
+app.get('/run', java_source.run);
 /**
  * Start Express server.
  */

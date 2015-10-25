@@ -5,9 +5,9 @@ var assign = require('object-assign');
 
 var postJson = require('../utils/ajax.js').postJson;
 
-var SeqDiagStore = require('./seq_diag_store.js');
 
-var _data = {seq_diagrams:{}};
+import SimulationAction from '../actions/simulation_action';
+
 
 import {CommonStore, RemoteStore} from './common_stores';
 import Immutable from 'immutable';
@@ -31,19 +31,22 @@ export class SimulationListStore extends CommonStore{
         break;
         
       case ActionType.REPLAY_START:
-        //_data.seq_diagrams[action.signal.jvm_name].replayJumpTo(action.signal);
         sim_store = this_store.get('simulation_map').get(this_store.get('active_jvm_id'));
         sim_store.replayStart();
         break;
       
       case ActionType.REPLAY_PAUSE:
-        //_data.seq_diagrams[action.signal.jvm_name].replayJumpTo(action.signal);
         sim_store = this_store.get('simulation_map').get(this_store.get('active_jvm_id'));
         sim_store.replayPause();
         break;
 
       case ActionType.REPLAY_JUMP_TO:
-        //_data.seq_diagrams[action.signal.jvm_name].replayJumpTo(action.signal);
+        sim_store = this_store.get('simulation_map').get(this_store.get('active_jvm_id'));
+        sim_store.replayJumpTo(action.seq);
+        break;
+      case ActionType.REPLAY_STEP_FORWORD:
+        sim_store = this_store.get('simulation_map').get(this_store.get('active_jvm_id'));
+        sim_store.replayStepForward(action.step_length);
         break;
 
       default:
@@ -58,25 +61,49 @@ export class SimulationStore extends CommonStore{
     super(props);
     this.signal_cache = [];
     this.load(0);
+    
+    this.load_source("Plant");
+    
   }
   
   tick(){
-    var current_tick = this.get('tick', 0);
+    var current_tick = this.get('tick', 1);
+    var this_store = this;
     if(!this.signal_cache[current_tick]){
-      this.load(current_tick);
+      this.replayPause();
+      this.load(current_tick).then(function(){
+        this_store.replayStart();
+        //this_store.tick();// tick again
+      });
+    }else{
+      console.log("current signal", this.signal_cache[current_tick]);
+      
+      this.set('tick', current_tick + 1);
     }
-    console.log("current signal", this.signal_cache[current_tick]);
-    this.set('tick', current_tick + 1);
+  }
+  
+  load_source(source_classname){
+    var this_store = this;
+   getJson('/api/parse_java').then((data) => {
+      console.log("source code loaded", data);
+      this_store.source_code = data;
+    }).catch(console.log);
+  }
+  
+  get_source(start_line,end_line){
+    
+    return this.source_code.source.slice(start_line, end_line);
   }
 
   load(start_tick){
     var this_store = this;
-    getJson('/api/get_next_signals/', {start_seq: start_tick}).then((data) => {
+    return getJson('/api/get_next_signals/', {start_seq: start_tick, jvm_id:this.get('jvm_id')}).then((data) => {
       
       console.log("signal data fected from ", data);      
       for(var s of data){
         console.log("signal", s.seq, s);
         this_store.signal_cache[s.seq] = s;
+        SimulationAction.addOutSignal(s);        
       }
       
     }).catch(function(err){
@@ -84,11 +111,16 @@ export class SimulationStore extends CommonStore{
     });
     
   }
-
+  
+  getCurrentSignal(){
+    var current_tick = this.get('tick', 0);   
+    return this.signal_cache[current_tick];
+  }
+  
   replayStart(){
     if(this.interval_var)
       clearInterval(this.interval_var);
-    this.interval_var = setInterval(this.tick.bind(this), this.get("interval", 300));
+    this.interval_var = setInterval(this.tick.bind(this), this.get("interval", 1000));
     
   }
 
@@ -97,48 +129,18 @@ export class SimulationStore extends CommonStore{
       clearInterval(this.interval_var);
     
   }
+  
+  replayJumpTo(seq){
+    this.set('tick', seq);
+  }
+
+  replayStepForward(step_length){
+    var seq = this.get('tick', 1) + step_length;
+    this.set('tick', seq);
+  }
+  
 };
 
-var SimulationStoreOld = assign({}, EventEmitter.prototype, {
-  
-  UPDATA_EVENT : 'update_event',
-  
-  reload: function(jvm_store){
-    console.log("reload simulation seq diagram data",jvm_store);
-    _data.seq_diagrams[jvm_store._id] = new SeqDiagStore(jvm_store);
-    this.setActiveJvm(jvm_store._id);
-    this.emitChange();
-   
-  },
-
-  setActiveJvm: function(jvm_name){
-    console.log("setting active jvm_name", jvm_name);
-    _data.active_jvm_name = jvm_name;
-  },
-
-  getData: function(){
-    return _data;
-  },
-  
-  emitChange: function() {
-    this.emit(this.UPDATE_EVENT);
-  },
-
-  
-  addUpdateEventListener: function(callback) {
-    this.on(this.UPDATE_EVENT, callback);
-  },
-
-  /**
-   * @param {function} callback
-   */
-  removeUpdateEventListener: function(callback) {
-    this.removeListener(this.UPDATE_EVENT, callback);
-  }
-});
-
-
-// Register callback to handle all updates
 
 
 

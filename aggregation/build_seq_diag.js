@@ -104,7 +104,7 @@ function naive_build(builder){
         reject(err);
       }).on('close', function () {
         var top_sort = require('../aggregation/signal_top_sort').signalTopSort;
-        top_sort(this.jvm_name).then(function(){
+        top_sort(builder.jvm_name).then(function(){
           resolve(counter);        
         });
       });
@@ -157,10 +157,12 @@ function createOutSignals(from_actor, from_lifeline) {
           new_signal.value = data.value;
           new_signal.version = data.version;
           new_signal.field = data.field;
-          new_signal.line_number = data.line_number;
+          //new_signal.line_number = data.line_number;
         } else {
           new_signal.method_desc = data.method_desc;
         }
+        if(data.line_number)
+          new_signal.line_number = data.line_number;
         //console.log("signal data", new_signal);
         var s_p = Signal.findOneAndUpdate({_id:signal_id}, {$set: new_signal}, {upsert:true, new:true})
           .exec()

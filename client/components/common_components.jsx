@@ -102,6 +102,10 @@ export class ContentBox extends React.Component{
 }
 
 
+//TODO: move this class to a seperate file
+import {getJson} from '../utils/ajax.js';
+import {Button, Input, Label, Fade, Collapse,Badge, Grid, Row, Col, Well} from 'react-bootstrap';
+
 export class UploadFileForm extends React.Component{
   
   constructor(props){
@@ -124,9 +128,9 @@ export class UploadFileForm extends React.Component{
       processData: false
     }).then(
       (data) => { //ajax request successed
-        this.setState({status: 'success', msg: "Upload success."}); 
-        console.log("upload successful",data);
-        this.setState({job_id: data.job_id});
+        this.setState(data); 
+        console.log("finished",data);
+        //this.setState({job_id: data.job_id});
       },
       (jqXHR, textStatus, errorThrown) => { //ajax request failed
         this.setState({status:'error', msg:"Error" + errorThrown});
@@ -135,12 +139,37 @@ export class UploadFileForm extends React.Component{
   }
   render() {
     var job_output;
+    var main_classes = [];
+    if(this.state.data){
+      var app_id = this.state.data.app_id
+      main_classes = this.state.data.main_classes.map(function(main_class){
+        var run_click = function(){
+          getJson("/run", {app_id: app_id, main_class_name: main_class}).then(function(data){
+            alert(data.msg);
+          });
+        }
+        return (
+          <li>
+            {main_class}
+            <div className="pull-right">
+              <Button bsStyle="warning" bsSize='xsmall'  onClick={run_click}>Run</Button>
+            </div>
+       
+          </li>
+        );
+      });
+    }
     return (
       <form encType="multipart/form-data" onSubmit={this.handleSubmit} id="file_upload_form" ref="uploadForm">
         <div className={"form-group has-" + this.state.status}>          
           <label className="control-label" htmlFor="uploadFile">{this.state.msg}</label>
           <input type="file" name="file" id="uploadFile" />
           <p className="help-block">{this.props.desc}</p>
+        </div>
+        <div>
+          <ul className="todo-list ui-sortable">
+            {main_classes}
+          </ul>
         </div>
         <button type="submit" className="btn btn-primary">
           <i className="fa fa-upload"></i> Upload

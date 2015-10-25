@@ -26,7 +26,7 @@ function topSortReduce(jvm_name, resolve, reject, count){
         Signal.update({incomming_edges: doc._id}, {$pull: {incomming_edges: doc._id}}, { multi: true })
           .exec(function(err, res){
             if(err) reject(err);
-            topSortReduce(resolve, reject, count + 1);
+            topSortReduce(jvm_name, resolve, reject, count + 1);
           });
       } else {
         resolve(count);
