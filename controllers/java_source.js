@@ -66,14 +66,15 @@ function parse(folder){
     });
   });
 }
+
 exports.run = function(req, res){
   UserApp.findOne({_id:req.query.app_id},function(err, app){
     JvmProcess.createJvmProcess(req.query.main_class_name, app._id).then(function(jvm){
-o      //var jvm_id = app._id + "_" + moment().format('YYYYMMDDHHmmss');
+      //var jvm_id = app._id + "_" + moment().format('YYYYMMDDHHmmss');
       exec(" docker run --name jdevv-exec --link jd-mongo:db -e \"jvm_id=" + jvm._id + "\" -v " + app.folder+ ":/data jdevv java -javaagent:jbd-agent.jar " + jvm.main_class);
       res.json({msg:'Execution starts'});
     }).catch(console.log);
     
   });
   
-}
+};
