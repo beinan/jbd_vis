@@ -15,8 +15,9 @@ var Promise = require('es6-promise').Promise;
 exports.signal_code_detail = function(req,res){
   var signal_id = req.params.signal_id;
   Signal.findOne({_id:signal_id}, function(err, signal){
-    get_parent_invocation(signal).then(function(parent_invocation){
-      return get_source(signal, parent_invocation);
+    get_method_invocation_detail(signal.jvm_name, signal.thread_id, signal.parent_invocation_id)
+      .then(function(parent_invocation){
+        return get_source(signal, parent_invocation);
     }).then(map_values)
       .then(function(data_returned){
       console.log(data_returned);
@@ -31,7 +32,49 @@ function map_values(data){
   return new Promise(
     function(resolve,reject){
       data.values = {};
-      resolve(data);
+      data.parent.args.shift(); //remove the first element.
+      data.values[data.parent.pos.begin_line] = [{op:'params', value:data.parent.args}];
+      var signal = data.signal;
+      //query all the trace from the parent method
+      var trace_query = {jvm_name:signal.jvm_name, thread_id:signal.thread_id, parent_invocation_id:signal.parent_invocation_id};
+      Trace.find(trace_query).sort({invocation_id:1}).exec(function(err, traces){
+         if(err){
+          console.log("query trace err",err);
+          reject(err);
+        }else{
+          var further_query_promise = [];
+          //console.log('traces', traces);
+          traces.forEach(function(t){
+            if(t.line_number){
+              if(!data.values[t.line_number])
+                data.values[t.line_number] = [];
+              if(t.msg_type=='field_getter'){
+                data.values[t.line_number].push(
+                  {invocation_id:t.invocation_id, value:t.value, field: t.field.split(',')[0], op:'read'}); 
+              }else if(t.msg_type=='field_setter'){
+                data.values[t.line_number].push(
+                  {invocation_id:t.invocation_id, value:t.value, field: t.field.split(',')[0], op:'write'});
+              }else if(t.msg_type=="method_invoke"){
+                var invoke_data = {invocation_id:t.invocation_id,op:'invoke',method:t.method_desc};
+                data.values[t.line_number].push(invoke_data);
+                further_query_promise.push(
+                  get_method_invocation_detail(t.jvm_name,t.thread_id,t.invocation_id + 1).then(function(m){
+                    m.args.shift();
+                    invoke_data.params = m.args;
+                  }));
+              }
+
+            }//end checking line number
+          });
+          
+        }
+        Promise.all(further_query_promise).then(()=>{
+          console.log(data.values);
+          resolve(data);
+        });
+        
+      });//end trace find
+      
     }
   );
 }
@@ -74,27 +117,27 @@ function get_source(signal, parent){
   );
 }
 
-function get_parent_invocation(signal){
+function get_method_invocation_detail(jvm_name, thread_id, invocation_id){
   return new Promise(
     function(resolve, reject){
        //query parent includes method_enter and method argument
-      var parent_query = {jvm_name:signal.jvm_name, thread_id:signal.thread_id, invocation_id:signal.parent_invocation_id};
-      Trace.find(parent_query, function(err, parent_traces){
-        var parent_invocation = {args:[]};
+      var method_query = {jvm_name:jvm_name, thread_id:thread_id, invocation_id:invocation_id};
+      Trace.find(method_query, function(err, method_traces){
+        var method_invocation = {args:[]};
         if(err){
           console.log("query parent err",err);
           reject(err);
         }else{
-          console.log('parent trace', parent_traces);
-          parent_traces.forEach(function(t){
+          console.log('parent trace', method_traces);
+          method_traces.forEach(function(t){
             if(t.msg_type=='method_enter'){
-              parent_invocation.class_name = t.method_desc.split('#')[0];
+              method_invocation.class_name = t.method_desc.split('#')[0];
             }else if(t.msg_type=='method_argument'){
-              parent_invocation.args[t.arg_seq] = t.value;
+              method_invocation.args[t.arg_seq] = t.value;
             }
           });
-          console.log(parent_invocation);
-          resolve(parent_invocation);
+          console.log(method_invocation);
+          resolve(method_invocation);
         }
       });//end trace find
     }

@@ -4,7 +4,12 @@ import SimulationStore from '../../stores/simulation_store';
 import {PureRenderComponent, ImmutablePropComponent} from '../common_components.jsx'
 import SimulationAction from '../../actions/simulation_action';
 
-
+const VALUE_COLOR = {
+  'read':'green',
+  'write':'red',
+  'invoke': 'blue',
+  'params': 'black'
+};
 class SourceLine extends React.Component{
   constructor(props){
     super(props);
@@ -18,9 +23,27 @@ class SourceLine extends React.Component{
     var is_value_display = 'none';
     if(this.state.is_value_display)
       is_value_display = 'block';
+    var values = [(<span style={{display:'block', color:'Orange'}}>Unreached code or no data.</span>)];
+    if(this.props.display_value){
+      values = this.props.display_value.map((v)=>{
+        var msg="";
+        if(v.op == "read"){
+          msg = "Get " + v.value + " from " + v.field;
+        }else if(v.op == 'write'){
+          msg = 'Set ' + v.value + " to " + v.field;
+        }else if(v.op == 'invoke'){
+          msg = 'Invoke ' + v.method.split('#')[1].split('(')[0] + JSON.stringify(v.params);
+        }else if(v.op=='params'){
+          msg = 'Pass in ' + JSON.stringify(v.value);
+        }
+        return (
+          <span style={{display:'block', color:VALUE_COLOR[v.op]}}>{msg}</span>
+        );
+      });
+    }
     return (
       <div>
-        <div style={{marginTop:10, paddingLeft:20, backgroundColor:'#cccccc', display:is_value_display}}>{this.props.display_value}</div>
+        <div style={{marginTop:10, paddingLeft:20, backgroundColor:'#cccccc', display:is_value_display}}>{values}</div>
         <pre className={class_name} style={{margin:0, fontSize:10, padding:2}} onClick={()=>{this.setState({is_value_display:!this.state.is_value_display})}}>
           <code className="language-java" data-lang="java">{this.props.line_number + ":" + this.props.line}</code>
         </pre>
