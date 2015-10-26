@@ -62,7 +62,7 @@ export class SimulationStore extends CommonStore{
     this.signal_cache = [];
     this.load(0);
     
-    this.load_source("Plant");
+    //this.load_source("Plant");
     
   }
   
@@ -83,11 +83,11 @@ export class SimulationStore extends CommonStore{
   }
   
   load_source(source_classname){
-    var this_store = this;
-   getJson('/api/parse_java').then((data) => {
+   /*var this_store = this;
+   getJson('/api/get_source').then((data) => {
       console.log("source code loaded", data);
       this_store.source_code = data;
-    }).catch(console.log);
+    }).catch(console.log);*/
   }
   
   get_source(start_line,end_line){
@@ -117,6 +117,11 @@ export class SimulationStore extends CommonStore{
     return this.signal_cache[current_tick];
   }
   
+  getCurrentSignalDetailStore(){
+    if(this.getCurrentSignal())
+      return new SimulationDetailStore(this.getCurrentSignal()._id);
+    return null;
+  }
   replayStart(){
     if(this.interval_var)
       clearInterval(this.interval_var);
@@ -141,6 +146,13 @@ export class SimulationStore extends CommonStore{
   
 };
 
-
+/**
+ * Maintain detail info about each signal in simualtion
+ */
+export class SimulationDetailStore extends RemoteStore{
+  constructor(signal_id){
+    super({},{url:'/api/signal_code_detail/'+signal_id});    
+  }
+};
 
 

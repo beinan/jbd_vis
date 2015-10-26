@@ -12,7 +12,8 @@ var traceSchema = new mongoose.Schema({
   line_number: Number,
   owner_ref: Number,
   version: Number,
-  value: String
+  value: String,
+  arg_seq:Number
 }, {collection: 'trace'});
 
 var Trace = mongoose.model('Trace', traceSchema);

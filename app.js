@@ -48,8 +48,8 @@ app.post('/api/build_seq_diag/', trace.buildSeqDiag);
 app.post('/api/get_seq_diag/', diagram.getSeqDiag);
 app.get('/api/get_method_invocation_info/', diagram.getMethodInvocationInfo);
 app.get('/api/get_next_signals/', diagram.getNextSignals);
-//app.get('/api/parse_java/', java_source.parse);
-
+//app.get('/api/get_source/', java_source.source);
+app.get('/api/signal_code_detail/:signal_id', java_source.signal_code_detail);
 
 app.post('/upload', upload.single('file'), java_source.upload);
 app.get('/run', java_source.run);

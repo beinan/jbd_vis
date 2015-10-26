@@ -1,10 +1,10 @@
 var mongoose = require('mongoose');
 
 var sourceFileSchema = new mongoose.Schema({
-  jvm_id: String,
-  file_name: String,
-  classes: [String],            
-  source: String,
+  user_app:{ type: mongoose.Schema.Types.ObjectId, ref: 'UserApp' },
+  //filename: String,
+  types: [String],            
+  source: [String],
   ast: mongoose.Schema.Types.Mixed
 
 });

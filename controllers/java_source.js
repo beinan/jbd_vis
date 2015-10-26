@@ -4,6 +4,106 @@ var moment = require('moment');
 var exec = require('../utils/shell_promise.js').exec;
 var UserApp = require('../models/UserApp');
 var JvmProcess = require('../models/JvmProcess');
+var SourceFile = require('../models/SourceFile');
+var Signal=require('../models/Signal');
+var Trace=require('../models/Trace');
+
+var Promise = require('es6-promise').Promise;
+
+
+//get related values of the signal passedin, also mapping the values to the source code.
+exports.signal_code_detail = function(req,res){
+  var signal_id = req.params.signal_id;
+  Signal.findOne({_id:signal_id}, function(err, signal){
+    get_parent_invocation(signal).then(function(parent_invocation){
+      return get_source(signal, parent_invocation);
+    }).then(map_values)
+      .then(function(data_returned){
+      console.log(data_returned);
+      res.json(data_returned);
+
+    }).catch((e)=>res.json(e));
+    
+  });
+};
+
+function map_values(data){
+  return new Promise(
+    function(resolve,reject){
+      data.values = {};
+      resolve(data);
+    }
+  );
+}
+function get_source(signal, parent){
+  return new Promise(
+    function(resolve, reject){
+      JvmProcess.findOne({_id:signal.jvm_name}, function(err, jvm){
+        if(err){
+          console.log('query jvm error',err);
+          reject(err);
+        }else{
+          SourceFile.findOne({user_app:jvm.user_app, types:parent.class_name}, function(err, source_file){
+            if(err){
+              console.log('query source error',err);
+              reject(err);
+            }else{
+              //console.log("source file", source_file);
+              var package_name = source_file.ast.package? source_file.ast.package + ".":"";
+              var type = source_file.ast.types.filter((t)=>{return (package_name + t.name) == parent.class_name;})[0];
+              //console.log('type', type);
+              var codes = [];
+              for(var i in type.members){
+                //console.log(type.members[i], type.members[i].pos);
+                var pos = type.members[i].pos;
+                if(pos && signal.line_number >= pos.begin_line && signal.line_number <= pos.end_line){
+                  console.log("match pos", pos);
+                  codes = source_file.source.slice(pos.begin_line - 1, pos.end_line);
+                  parent.pos = pos;
+                }
+              }
+              var data_returned = {signal:signal, parent:parent, codes:codes};
+              resolve(data_returned);
+
+            }
+          });
+        }
+      });
+      
+    }
+  );
+}
+
+function get_parent_invocation(signal){
+  return new Promise(
+    function(resolve, reject){
+       //query parent includes method_enter and method argument
+      var parent_query = {jvm_name:signal.jvm_name, thread_id:signal.thread_id, invocation_id:signal.parent_invocation_id};
+      Trace.find(parent_query, function(err, parent_traces){
+        var parent_invocation = {args:[]};
+        if(err){
+          console.log("query parent err",err);
+          reject(err);
+        }else{
+          console.log('parent trace', parent_traces);
+          parent_traces.forEach(function(t){
+            if(t.msg_type=='method_enter'){
+              parent_invocation.class_name = t.method_desc.split('#')[0];
+            }else if(t.msg_type=='method_argument'){
+              parent_invocation.args[t.arg_seq] = t.value;
+            }
+          });
+          console.log(parent_invocation);
+          resolve(parent_invocation);
+        }
+      });//end trace find
+    }
+  );
+}
+
+exports.source =function(req, res){
+  console.log(req.query);
+};
 
 exports.upload = function(req, res) {
   console.log(req.file);
@@ -41,26 +141,38 @@ function parse(folder){
     var parse_promises =  file_list.filter(function(filename){
       return path.extname(filename) == '.java';
     }).map(function(filename){
-      return exec("/home/bwang19/java_ast2json/target/universal/stage/bin/java_ast2json " + filename);
+      var read_file_p = fsp.readFile(filename);
+      var parse_p = exec("/home/bwang19/java_ast2json/target/universal/stage/bin/java_ast2json " + filename);
+      return Promise.all([read_file_p, parse_p]);
     });
     return Promise.all(parse_promises).then(function(data){
       return UserApp.createUserApp(folder).then(function(user_app){ //create a user app object in mongodb
         var main_classes = [];
-        data.forEach(function(d){
-          var json = JSON.parse(d);
+        data.forEach(function(d){ //for each source file
+          var lines = d[0].split('\n');
+          var json = JSON.parse(d[1]);  //parse output from java_ast2json to a js object
           //console.log(json.types);
+          
           var package_name = json.package?json.package+".":"";
+          var types = [];  //class and interface in this source file.
           json.types.forEach(function(t){
             console.log(t.name);
-            t.members.forEach(function(m){
+            var class_name = package_name + t.name;  //classname with package name
+             
+            t.members.forEach(function(m){ //for each member, e.g. method and field
               //console.log(m);
-              if(m.name == "main" && m.modifiers==9){
+               if(m.name == "main" && m.modifiers==9){
                 //public static main function
-                main_classes.push(package_name + t.name);
+                main_classes.push(class_name);
               }
-            });
+            }); //for each member finished
+            types.push(class_name);            
+          });  //for each type finished
+          SourceFile.create({user_app:user_app._id, source: lines, ast: json, types: types}, function(err, source){
+            console.log("SourceFile instance in mongo created", err, source);
           });
-        });
+          
+        }); //for each file finished.
         return {app_id: user_app._id, main_classes:main_classes};
       });
     });

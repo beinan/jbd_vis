@@ -169,6 +169,16 @@ function createOutSignals(from_actor, from_lifeline) {
           .then(
             function(doc){
               //console.log("findOneAndUpdate or create a signal:", doc);
+              if(doc.signal_type == "method_invoke"){//get arguments value
+                Trace.findOne({thread_id: doc.thread_id, invocation_id: doc.invocation_id + 1, msg_type: "method_enter", jvm_name:doc.jvm_name}, function(err, method_enter){
+                  if(!err && method_enter){
+                    Trace.find({thread_id: doc.thread_id, invocation_id: doc.invocation_id + 1, msg_type: "method_argument", jvm_name:doc.jvm_name}, function(err, arguments){
+                      var args = arguments.map(function(a){return a.value;});
+                      
+                    });
+                  }
+                });
+              }
             },
             function(err){
               console.log(err);
