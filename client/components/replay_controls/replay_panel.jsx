@@ -25,10 +25,17 @@ class SourceLine extends React.Component{
       is_value_display = 'block';
     var values = [(<span style={{display:'block', color:'Orange'}}>Unreached code or no data.</span>)];
     if(this.props.display_value){
+      var watch=(field_data, e)=>{
+        e.preventDefault();
+        console.log(field_data);
+        SimulationAction.addWatchField(field_data.field_original);
+      }
       values = this.props.display_value.map((v)=>{
         var msg="";
+        var ops = null; //operation buttons if available
         if(v.op == "read"){
           msg = "Get " + v.value + " from " + v.field;
+          ops = (<a href="#" onClick={watch.bind(null, v)} className="btn btn-primary btn-sm">Watch</a>);
         }else if(v.op == 'write'){
           msg = 'Set ' + v.value + " to " + v.field;
         }else if(v.op == 'invoke'){
@@ -37,7 +44,7 @@ class SourceLine extends React.Component{
           msg = 'Pass in ' + JSON.stringify(v.value);
         }
         return (
-          <span style={{display:'block', color:VALUE_COLOR[v.op]}}>{msg}</span>
+          <span style={{display:'block', color:VALUE_COLOR[v.op]}}>{msg}<span style={{marginLeft:10}}>{ops}</span></span>
         );
       });
     }

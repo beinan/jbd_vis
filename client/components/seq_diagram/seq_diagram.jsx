@@ -6,6 +6,8 @@ import Lifeline from './lifeline.jsx'
 import {ImmutablePropComponent, PureRenderComponent, ContentBox} from '../common_components.jsx';
 
 import SimulationBar from '../replay_controls/simulation_bar.jsx'
+import Monitor from '../replay_controls/monitor.jsx'
+
 import StoreFactory from '../../stores/store_factory'
 
 export default class SeqDiagram extends PureRenderComponent{
@@ -47,6 +49,10 @@ export default class SeqDiagram extends PureRenderComponent{
     }
     var marker='<marker id="end" viewBox="0 -5 10 10" refX="10" refY="0" markerWidth="8" markerHeight="8" orient="auto"><path d="M0,-5L10,0L0,5"></path></marker>';
     return(
+      <div>
+        <div style={{position: 'fixed',top: 50, left: 200, backgroundColor: 'white'}}>
+          <Monitor store={StoreFactory.getSimulationListStore().get("simulation_map").get(this.props.jvm_id).getMonitorStore()}/>
+        </div>
       <svg width={this.state.data.get("width")} height={this.state.data.get("height")}>
         <defs dangerouslySetInnerHTML={{__html: marker}}>          
         </defs>
@@ -58,6 +64,7 @@ export default class SeqDiagram extends PureRenderComponent{
                        max_width = {this.state.data.get("width")}
                        store={StoreFactory.getSimulationListStore().get("simulation_map").get(this.props.jvm_id)}/>
       </svg>
+      </div>
     );
   }
 }

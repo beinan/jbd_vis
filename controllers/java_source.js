@@ -10,6 +10,46 @@ var Trace=require('../models/Trace');
 
 var Promise = require('es6-promise').Promise;
 
+exports.field_monitor = function(req, res){
+  console.log("monitor", req.body);
+  var jvm_name = req.body.jvm_id;
+  var seq = req.body.seq;
+  var promises = req.body.fields.map((f)=>{
+    return new Promise(
+      function(resolve, reject){
+        var query = Signal.find({
+          jvm_name: jvm_name, 
+          seq: {$lte: seq}, 
+          field:f, 
+          signal_type:{$in:['field_getter', 'field_setter']}
+        }).sort({seq: -1}).limit(1);
+        query.exec(function(err, doc){
+          if(err){
+            reject(err);
+          }
+          else{
+            if(doc && doc[0])
+              resolve({field: f, value: doc[0].value});
+            else
+              resolve(null);
+          }
+          
+        });
+      });
+  });
+  Promise.all(promises).then(function(data){
+    var map = {};
+    data.forEach(
+      (d)=>{
+        if(d){
+          map[d.field] = d.value;
+        }
+    });
+    console.log('monitor data', map);
+    res.json({data:map});
+  });
+  
+};
 
 //get related values of the signal passedin, also mapping the values to the source code.
 exports.signal_code_detail = function(req,res){
@@ -20,7 +60,7 @@ exports.signal_code_detail = function(req,res){
         return get_source(signal, parent_invocation);
     }).then(map_values)
       .then(function(data_returned){
-      console.log(data_returned);
+      //console.log(data_returned);
       res.json(data_returned);
 
     }).catch((e)=>res.json(e));
@@ -50,10 +90,10 @@ function map_values(data){
                 data.values[t.line_number] = [];
               if(t.msg_type=='field_getter'){
                 data.values[t.line_number].push(
-                  {invocation_id:t.invocation_id, value:t.value, field: t.field.split(',')[0], op:'read'}); 
+                  {invocation_id:t.invocation_id, value:t.value, thread_id: t.thread_id, field_original: t.field, field: t.field.split(',')[0], op:'read'}); 
               }else if(t.msg_type=='field_setter'){
                 data.values[t.line_number].push(
-                  {invocation_id:t.invocation_id, value:t.value, field: t.field.split(',')[0], op:'write'});
+                  {invocation_id:t.invocation_id, value:t.value, thread_id: t.thread_id, field_original: t.field, field: t.field.split(',')[0], op:'write'});
               }else if(t.msg_type=="method_invoke"){
                 var invoke_data = {invocation_id:t.invocation_id,op:'invoke',method:t.method_desc};
                 data.values[t.line_number].push(invoke_data);
@@ -69,7 +109,7 @@ function map_values(data){
           
         }
         Promise.all(further_query_promise).then(()=>{
-          console.log(data.values);
+          //console.log(data.values);
           resolve(data);
         });
         
@@ -100,7 +140,7 @@ function get_source(signal, parent){
                 //console.log(type.members[i], type.members[i].pos);
                 var pos = type.members[i].pos;
                 if(pos && signal.line_number >= pos.begin_line && signal.line_number <= pos.end_line){
-                  console.log("match pos", pos);
+                  //console.log("match pos", pos);
                   codes = source_file.source.slice(pos.begin_line - 1, pos.end_line);
                   parent.pos = pos;
                 }
@@ -128,7 +168,7 @@ function get_method_invocation_detail(jvm_name, thread_id, invocation_id){
           console.log("query parent err",err);
           reject(err);
         }else{
-          console.log('parent trace', method_traces);
+          //console.log('parent trace', method_traces);
           method_traces.forEach(function(t){
             if(t.msg_type=='method_enter'){
               method_invocation.class_name = t.method_desc.split('#')[0];
@@ -136,7 +176,7 @@ function get_method_invocation_detail(jvm_name, thread_id, invocation_id){
               method_invocation.args[t.arg_seq] = t.value;
             }
           });
-          console.log(method_invocation);
+          //console.log(method_invocation);
           resolve(method_invocation);
         }
       });//end trace find

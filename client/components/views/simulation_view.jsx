@@ -39,6 +39,7 @@ export default class SimulationView extends React.Component{
         </section>
         {/*content*/}
         <div className="content body">
+          
           <div className="row" style={{overflow:'auto'}}>
             {seq_diagram}
           </div>

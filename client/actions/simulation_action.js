@@ -70,6 +70,13 @@ class SimulationAction {
       step_length: step_length
     });
   }
+  
+  addWatchField(field_name){
+    AppDispatcher.dispatch({
+      actionType: ActionType.ADD_WATCH_FIELD,
+      field_name: field_name
+    });
+  }
 }
 
 let instance = new SimulationAction();

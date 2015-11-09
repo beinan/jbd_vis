@@ -19,5 +19,6 @@ module.exports = keyMirror({
   REPLAY_PAUSE: null,
   REPLAY_STEP_FORWORD: null,
   ACTIVE_LIFELINE: null,
-  ADD_OUT_SIGNAL: null
+  ADD_OUT_SIGNAL: null,
+  ADD_WATCH_FIELD: null
 });

@@ -49,6 +49,11 @@ export class SimulationListStore extends CommonStore{
         sim_store.replayStepForward(action.step_length);
         break;
 
+      case ActionType.ADD_WATCH_FIELD:
+        sim_store = this_store.get('simulation_map').get(this_store.get('active_jvm_id'));
+        sim_store.getMonitorStore().addField(action.field_name);;
+        break;
+
       default:
         // no op
       }
@@ -62,6 +67,7 @@ export class SimulationStore extends CommonStore{
     this.signal_cache = [];
     this.load(0);
     
+    this.set('monitor_store', new MonitorStore(this.get('jvm_id')));
     //this.load_source("Plant");
     
   }
@@ -69,17 +75,7 @@ export class SimulationStore extends CommonStore{
   tick(){
     var current_tick = this.get('tick', 1);
     var this_store = this;
-    if(!this.signal_cache[current_tick]){
-      this.replayPause();
-      this.load(current_tick).then(function(){
-        this_store.replayStart();
-        //this_store.tick();// tick again
-      });
-    }else{
-      console.log("current signal", this.signal_cache[current_tick]);
-      
-      this.set('tick', current_tick + 1);
-    }
+    this.updateTick(current_tick + 1);
   }
   
   load_source(source_classname){
@@ -93,6 +89,23 @@ export class SimulationStore extends CommonStore{
   get_source(start_line,end_line){
     
     return this.source_code.source.slice(start_line, end_line);
+  }
+  
+  updateTick(new_tick){
+    if(!this.signal_cache[new_tick]){
+      this.replayPause();
+      this.load(new_tick).then(function(){
+        this_store.replayStart();
+        //this_store.tick();// tick again
+      });
+    }else{
+      console.log("new signal", this.signal_cache[new_tick]);
+      
+      this.set('tick', new_tick);
+      this.getMonitorStore().reload(new_tick);
+    }
+    //this.set('tick', new_tick);
+    
   }
 
   load(start_tick){
@@ -136,12 +149,18 @@ export class SimulationStore extends CommonStore{
   }
   
   replayJumpTo(seq){
-    this.set('tick', seq);
+    //this.set('tick', seq);
+    this.updateTick(seq);
   }
 
   replayStepForward(step_length){
     var seq = this.get('tick', 1) + step_length;
-    this.set('tick', seq);
+    //this.set('tick', seq);
+    this.updateTick(seq);
+  }
+
+  getMonitorStore(){
+    return this.get('monitor_store');
   }
   
 };
@@ -155,4 +174,34 @@ export class SimulationDetailStore extends RemoteStore{
   }
 };
 
+
+export class MonitorStore extends CommonStore{
+  constructor(jvm_id){
+    super({jvm_id:jvm_id, fields:new Immutable.Set(), data:{}});
+    //this.set('fields', new Immutable.Set());
+  }
+  
+  addField(field_name){
+    console.log('add field to watch', field_name);
+    this.set('fields', this.get('fields').add(field_name));
+    this.reload(this.get('last_load_seq', 0));
+  }
+  reload(seq){
+    this.set('last_load_seq', seq);
+    this.set('status', 'loading');
+    var this_store = this;
+    postJson("/api/field_monitor", {
+      fields: this.get('fields').toArray(), 
+      seq:seq,
+      jvm_id: this.get('jvm_id')
+    }).then((data) => {
+      
+      console.log("monitor data received ", data);      
+      this_store.merge(assign({'status':"ready"}, data));
+       
+    }).catch(function(err){
+      console.log(err, err.stack);
+    });
+  }
+};
 

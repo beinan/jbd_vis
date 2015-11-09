@@ -255,7 +255,7 @@ export class SeqDiagStore extends CommonStore {
         var previous_signal_seq = signals[i-1].get('seq');
         
         //height for each out signals
-        var seq_height = (signals[i].get('y') - previous_signal_y - 5) / (signals[i].get('seq') - previous_signal_seq);
+        var seq_height = (signals[i].get('y') - previous_signal_y - 12) / (signals[i].get('seq') - previous_signal_seq);
         return previous_signal_y + (seq - previous_signal_seq) * seq_height + 12;
       }
       
