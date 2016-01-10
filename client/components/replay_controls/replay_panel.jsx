@@ -4,16 +4,37 @@ import SimulationStore from '../../stores/simulation_store';
 import {PureRenderComponent, ImmutablePropComponent} from '../common_components.jsx'
 import SimulationAction from '../../actions/simulation_action';
 
+import SourceLineDetail from './source_line_detail.jsx'
+
+import SourceLineDetailStore from '../../stores/source_line_store'
+
+import { Button, Modal, OverlayTrigger, Popover, Tooltip, ListGroup, ListGroupItem} from 'react-bootstrap';
+
+import ObjectRefPopover from './obj_ref_popover.jsx'
+
 const VALUE_COLOR = {
-  'read':'green',
-  'write':'red',
-  'invoke': 'blue',
-  'params': 'black'
+  'read':'success',
+  'write':'danger',
+  'invoke': 'info',
+  'params': 'warning'
 };
 class SourceLine extends React.Component{
   constructor(props){
     super(props);
     this.state= {is_value_display:false};
+    this.sourceLineDetailStore = new SourceLineDetailStore({line_number:props.line_number, source_file:props.source_file});
+    this.componentDidMount = this.componentDidMount.bind(this);
+  }
+  
+  componentDidMount(){
+    //super.componentDidMount();
+    //calculate the position and size of the head box
+    //super.componentDidMount();
+    if(this.props.is_current){
+      var offset = this.refs.code_line.getDOMNode().offsetTop;
+      console.log('offset code line:', this.refs.code_line, offset);
+      $('.control-sidebar').animate({scrollTop: offset - 100}, 'slow');
+    }
   }
   render(){
     var class_name = "";
@@ -23,7 +44,7 @@ class SourceLine extends React.Component{
     var is_value_display = 'none';
     if(this.state.is_value_display)
       is_value_display = 'block';
-    var values = [(<span style={{display:'block', color:'Orange'}}>Unreached code or no data.</span>)];
+    var values = [(<span style={{display:'block', color:'Orange'}}>Unreached code or no data in the current context.</span>)];
     if(this.props.display_value){
       var watch=(field_data, e)=>{
         e.preventDefault();
@@ -35,24 +56,42 @@ class SourceLine extends React.Component{
         var ops = null; //operation buttons if available
         if(v.op == "read"){
           msg = "Get " + v.value + " from " + v.field;
-          ops = (<a href="#" onClick={watch.bind(null, v)} className="btn btn-primary btn-sm">Watch</a>);
+          ops = (<Button onClick={watch.bind(null, v)} bsSize="xsmall" bsStyle="success">Watch</Button>);
         }else if(v.op == 'write'){
-          msg = 'Set ' + v.value + " to " + v.field;
+          var overlay = <ObjectRefPopover obj_ref={v.owner_ref} jvm_name={v.jvm_name}></ObjectRefPopover>
+          msg = (
+            <span>{'Set ' + v.value + " to "}
+              <OverlayTrigger trigger="click" placement="top" rootClose="true" 
+                              overlay={<Popover title="Object Reference View">{overlay}</Popover>}>
+                <Button bsStyle="warning" bsSize="xsmall">{v.owner}</Button>
+              </OverlayTrigger>
+              .
+              <Button bsStyle="default" bsSize="xsmall">{v.field}</Button>
+            </span>);
+          ops = (<Button onClick={watch.bind(null, v)} bsSize="xsmall" bsStyle="success">Watch</Button>);       
         }else if(v.op == 'invoke'){
           msg = 'Invoke ' + v.method.split('#')[1].split('(')[0] + JSON.stringify(v.params);
         }else if(v.op=='params'){
           msg = 'Pass in ' + JSON.stringify(v.value);
         }
         return (
-          <span style={{display:'block', color:VALUE_COLOR[v.op]}}>{msg}<span style={{marginLeft:10}}>{ops}</span></span>
+          <ListGroupItem bsStyle={VALUE_COLOR[v.op]}>
+            <span style={{marginLeft:10}}>{ops}</span>{msg}
+          </ListGroupItem>
         );
       });
     }
     return (
-      <div>
-        <div style={{marginTop:10, paddingLeft:20, backgroundColor:'#cccccc', display:is_value_display}}>{values}</div>
+      <div ref="code_line">
+        <div style={{marginTop:10, paddingLeft:20, backgroundColor:'#cccccc', display:is_value_display}}>
+          <ListGroup>
+          {values}
+          </ListGroup>
+          <SourceLineDetail store={this.sourceLineDetailStore}/>
+        </div>
+
         <pre className={class_name} style={{margin:0, fontSize:10, padding:2}} onClick={()=>{this.setState({is_value_display:!this.state.is_value_display})}}>
-          <code className="language-java" data-lang="java">{this.props.line_number + ":" + this.props.line}</code>
+          <code className="language-java" data-lang="java">{this.props.line_number  + ":" + this.props.line}</code>
         </pre>
       </div>
     );
@@ -70,14 +109,17 @@ class SourceCodePanel extends PureRenderComponent{
     var codes = [];
     var data = this.state.data.get('data', {});
     var source_codes = data.codes;
-    if(source_codes){
-      var start = 
+     if(source_codes){
+      //var current_line = data.signal.line_number;    
       codes = source_codes.map((line, i)=>{
-        var line_number = data.parent.pos.begin_line + i;
+        var line_number = i+1; //data.parent.pos.begin_line + i;
         return (
           <SourceLine line={line} line_number={line_number} 
                       is_current={line_number == data.signal.line_number} 
-                      display_value={data.values[line_number]}/>
+                      display_value={data.values[line_number]}
+                      source_file={data.source_file}
+                      simulation_detail_store={this.props.store}
+          />
         );
       });
     }

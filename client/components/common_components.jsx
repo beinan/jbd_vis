@@ -37,12 +37,12 @@ export class PureRenderComponent extends ImmutablePropComponent{
   }
 
   componentDidMount() {
-    //console.log("component did mount:", this.constructor.name, this.props.store); 
+    console.log("component did mount:", this.constructor.name, this.props.store); 
     this.props.store.addEventListener(this._onChange);
   }
 
   componentWillUnmount() {
-    //console.log("component will unmount:", this.constructor.name, this.props.store); 
+    console.log("component will unmount:", this.constructor.name, this.props.store); 
     this.props.store.removeEventListener(this._onChange);
   }
   
@@ -52,9 +52,9 @@ export class PureRenderComponent extends ImmutablePropComponent{
 
   _onChange() {
     try{
-      //console.log("setting state start", this.constructor.name);
+      console.log("setting state start", this.constructor.name, this.props.store.getData());
       this.setState({data:this.props.store.getData()});
-      //console.log("setting state finished",  this.constructor.name);
+      console.log("setting state finished",  this.constructor.name);
     }catch(e){
       console.error("setState exception", e, e.stack);
     }

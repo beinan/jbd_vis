@@ -14,11 +14,11 @@ export class CommonStore extends EventEmitter{
 
   merge(new_data, doesNotify = true){
     //update(updater: (value: Map<K, V>) => Map<K, V>): Map<K, V>
-    //console.log("update", new_data);
+    console.log("update", doesNotify, new_data);
     this._data = this._data.merge(Immutable.Map(new_data));
     if(doesNotify)
       this.emitChange();
-    //console.log("update finished");
+    console.log("update finished");
   }
   
   set(k, v, doesNotify = true){
@@ -43,11 +43,11 @@ export class CommonStore extends EventEmitter{
 
   emitChange() {
     try{
-      //console.log("emitting change start:", this.constructor.name);
+      console.log("emitting change start:", this.constructor.name);
       this.emit(UPDATE_EVENT);
-      //console.log("emitting change finished:", this.constructor.name);
+      console.log("emitting change finished:", this.constructor.name);
     }catch(e){
-      console.log(e);  
+      console.error("emit change error", e);  
     }
   }
 
@@ -85,7 +85,7 @@ export class RemoteStore extends CommonStore{
       this_store.merge(assign({'status':"ready"}, this_store.process_remote_data(data)));
        
     }).catch(function(err){
-      console.log(err, err.stack);
+      console.error("reload error", err, err.stack);
     });
   }
   

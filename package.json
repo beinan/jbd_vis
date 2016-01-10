@@ -33,8 +33,10 @@
     "morgan": "^1.6.1",
     "multer": "^1.0.3",
     "object-assign": "^3.0.0",
-    "react": "^0.13.3",
-    "react-bootstrap": "^0.25.1",
+    "react": "^0.14.6",
+    "react-bootstrap": "^0.28.2",
+    "react-dom": "^0.14.6",
+    "react-google-charts": "^0.2.0",
     "shallow-equals": "0.0.0",
     "shelljs": "^0.5.1",
     "unzip": "^0.1.11"

@@ -7,7 +7,9 @@ import ViewType from '../../view_type';
 
 import {ImmutablePropComponent, PureRenderComponent, ContentBox, UploadFileForm} from '../common_components.jsx';
 
-import {Button, Input, Label, Fade, Collapse,Badge, Grid, Row, Col, Well} from 'react-bootstrap';
+import {Button, Input, Label, Fade, Collapse,Badge, Grid, Row, Col, Well,DropdownButton, MenuItem} from 'react-bootstrap';
+
+import {getJson} from '../../utils/ajax'
 
 class JvmMethodsFilterClassEntry extends PureRenderComponent{
   
@@ -134,6 +136,87 @@ class JvmListBox extends PureRenderComponent{
 
 
 
+class GitRepositoryForm extends ImmutablePropComponent{
+  constructor(props){
+    super(props);
+    this.state = {};
+  }
+
+  render(){
+
+    var main_classes = [];
+    if(this.state.data){
+      var app_id = this.state.data.app_id
+      main_classes = this.state.data.main_classes.map(function(main_class){
+        var run_click = function(){
+          getJson("/run", {app_id: app_id, main_class_name: main_class}).then(function(data){
+            alert(data.msg);
+          });
+        }
+        return (
+          <li>
+            {main_class}
+            <div className="pull-right">
+              <Button bsStyle="warning" bsSize='xsmall'  onClick={run_click}>Run</Button>
+            </div>
+       
+          </li>
+        );
+      });
+    }
+    
+    var fetch = ()=>{
+      var uri = this.refs.git_uri.getValue();
+      console.log("fetching git Repository:", this,this.refs, this.refs.git_uri, uri);
+      var localHistory = JSON.parse(localStorage.getItem('git_uri'));
+      if(!localHistory)
+        localHistory = [];
+      if(localHistory.indexOf(uri) == -1){
+        localHistory.push(uri);
+        localStorage.setItem('git_uri', JSON.stringify(localHistory));
+      }
+
+      getJson('/fetch_git', {uri:uri}).then((data)=>{
+        console.log('data from /fetch_git', data);
+        this.setState(data); 
+       
+      }).catch((err)=> {console.log(err)})
+    }
+
+    var fetch_but = <Button  bsStyle="warning"  onClick={fetch.bind(this)}>Fetch</Button>;
+    var localHistory = JSON.parse(localStorage.getItem('git_uri'));
+    if(!localHistory)
+        localHistory = [];
+    var history_items = localHistory.map((h, i)=>{
+      var item_onclick = ()=>{
+        console.log("click history",this, this.state, h);
+        this.setState({uri:h});
+      };
+
+      return (<MenuItem key={"history_item_" + i} onSelect={item_onclick}>{h}</MenuItem>);
+    });
+    var uri_history=(
+      <DropdownButton title="History" id="input-dropdown-addon">
+        {history_items}
+      </DropdownButton>
+    );
+    return (
+      <div>
+        <div className="form-group">          
+          <label className="control-label" htmlFor="gitUri">Git Repository</label>
+          <Input type="text" name="git_uri" id="gitUri" ref="git_uri" 
+                 buttonBefore={uri_history} buttonAfter={fetch_but} value={this.state.uri}/>
+          
+        </div>
+        <div>
+          <ul className="todo-list ui-sortable">
+            {main_classes}
+          </ul>
+        </div>
+      </div>
+    );
+  }
+}
 
 class JvmsView extends ImmutablePropComponent{
   constructor(props){
@@ -161,11 +244,15 @@ class JvmsView extends ImmutablePropComponent{
             <JvmListBox store={StoreFactory.getJvmProcessListStore()}/>           
           </div>
           <div className="row" >
+            <GitRepositoryForm></GitRepositoryForm>           
+          </div>
+          
+          <div className="row" >
             <UploadFileForm url="/upload" title="Upload Java source files or jars" dese="" />           
           </div>
           
         </div>
-      x</div>
+      </div>
     )
   }
 

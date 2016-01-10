@@ -2,6 +2,7 @@ var path = require('path');
 var fsp = require('../utils/fs_promise.js');
 var moment = require('moment');
 var exec = require('../utils/shell_promise.js').exec;
+var execDocker = require('../utils/shell_promise.js').execDocker;
 var UserApp = require('../models/UserApp');
 var JvmProcess = require('../models/JvmProcess');
 var SourceFile = require('../models/SourceFile');
@@ -9,6 +10,86 @@ var Signal=require('../models/Signal');
 var Trace=require('../models/Trace');
 
 var Promise = require('es6-promise').Promise;
+
+var type_map = {
+  I: 'int',
+  Z: 'bool',
+  B: 'byte',
+  J: 'long',
+  F: 'float',
+  D: 'double',
+  C: 'char',
+  L: 'class'
+};
+exports.obj_detail = function(req, res){
+  console.log(req.query.obj_ref);
+  Signal.aggregate(
+    [{$match:{jvm_name: req.query.jvm_name, owner_ref:parseInt(req.query.obj_ref)}},
+    {$group:{_id:"$field"}}], 
+    function(err, signals){
+    //console.log(signals);
+      var fields = signals.map(function(s){
+        var id = s._id;
+        var class_name = id.split('@')[0];
+        var field_name = id.split('@')[1].split(',')[0];
+        var field_type = id.split(',')[1];
+        return {field_id:s._id, class_name:class_name, field_name:field_name, field_type:type_map[field_type]};
+      });
+      console.log(fields);
+      res.json({fields:fields});
+  });
+  //console.log(req.file);
+  
+}
+exports.source_line_detail = function(req, res){
+  var line_number = req.params.line_number;
+  SourceFile.findOne({_id:req.params.source_file}, function(err, source_file){
+    if(err){
+      console.log('query source error',err);
+      reject(err);
+    }else{
+      //console.log("source file", source_file);
+      var package_name = source_file.ast.package? source_file.ast.package + ".":"";
+      
+      for(var t of source_file.ast.types){
+        for(var m of t.members){
+          //console.log("m pos", m.pos, line_number);
+          if( m.pos && m.pos.begin_line < line_number && m.pos.end_line > line_number){
+            var class_name = package_name + t.name;
+            var method_desc = class_name + "#" + m.name;
+            console.log("matched method:", method_desc);
+            Trace.find({method_desc:{$regex:'^' + method_desc}, msg_type:'method_enter'}, {invocation_id:1},function(err, traces){
+              //console.log(traces);
+              var parent_ids = traces.map((t) => t.invocation_id);
+              console.log(parent_ids);
+              Signal.find({parent_invocation_id:{$in:parent_ids}, line_number:line_number}).sort({seq:1}).exec(function(err, signals){
+                //console.log("singals", err, signals);
+                var result = {};
+                signals.forEach((s)=> {
+                  if(!result[s.thread_id]){
+                    result[s.thread_id] = {};
+                  }
+                  if(!result[s.thread_id][s.parent_invocation_id]){
+                    result[s.thread_id][s.parent_invocation_id] = [];
+                  }
+                  result[s.thread_id][s.parent_invocation_id].push(s);
+                });
+                //console.log(result);
+                res.json({data:result});
+              });
+              
+            });
+            return;
+          }
+        }
+      } //there should be only one method matched.
+      
+      
+    }
+  });
+
+};
+
 
 exports.field_monitor = function(req, res){
   console.log("monitor", req.body);
@@ -51,6 +132,63 @@ exports.field_monitor = function(req, res){
   
 };
 
+exports.fields_history_value = function(req, res){
+  console.log("field_history_value", req.body);
+  var jvm_name = req.body.jvm_name;
+  var seq = 0;
+  var promises = req.body.fields.filter((d)=>{return d.active;}).map((f)=>{
+    return new Promise(
+      function(resolve, reject){
+        var query = Signal.find({
+          jvm_name: jvm_name,
+          owner_ref: req.body.obj_ref,
+          field:f.field_id, 
+          signal_type:{$in:['field_getter', 'field_setter']}
+        }).sort({seq: 1});
+        query.exec(function(err, doc){
+          if(err){
+            reject(err);
+          }
+          else{
+            
+            resolve({field: f.field_name, values: doc});
+            
+          }
+          
+        });
+      });
+  });
+  Promise.all(promises).then(function(data){
+    var rows = [];
+    var columns = [['number','Seq']];
+    data.forEach(
+      (d, c)=>{
+        columns[c+1] = ['number',d.field];
+        var i = 0;
+        var value = 0;
+        d.values.forEach((s) => {
+          while(i < s.seq){
+            if(!rows[i])
+              rows[i] = [i];
+            rows[i][c+1] = value;
+            i++;  
+          }
+          value = parseFloat(s.value);
+        });
+        
+    });
+    for(var r = 0; r < rows.length; r++)
+      for(var c = 1; c < columns.length; c++){
+        //console.log(rows[r]);
+        if(rows[r][c] === undefined)
+          rows[r][c] = rows[r-1][c];
+      }
+    console.log('monitor data', rows);
+    res.json({rows:rows, columns:columns});
+  }).catch(console.log);
+  
+}
+
 //get related values of the signal passedin, also mapping the values to the source code.
 exports.signal_code_detail = function(req,res){
   var signal_id = req.params.signal_id;
@@ -90,10 +228,27 @@ function map_values(data){
                 data.values[t.line_number] = [];
               if(t.msg_type=='field_getter'){
                 data.values[t.line_number].push(
-                  {invocation_id:t.invocation_id, value:t.value, thread_id: t.thread_id, field_original: t.field, field: t.field.split(',')[0], op:'read'}); 
+                  {
+                   jvm_name:signal.jvm_name,
+                   invocation_id:t.invocation_id, value:t.value, thread_id: t.thread_id, 
+                   field_original: t.field, 
+                   field: t.field.split(',')[0].split('@')[1], 
+                   owner_ref: t.owner_ref,
+                   owner: t.owner_ref?"obj":t.field.split(',')[0].split('@')[0],
+                   datetime:t.created_datetime,
+                   op:'read'}); 
               }else if(t.msg_type=='field_setter'){
+                console.log("setter:", t);
                 data.values[t.line_number].push(
-                  {invocation_id:t.invocation_id, value:t.value, thread_id: t.thread_id, field_original: t.field, field: t.field.split(',')[0], op:'write'});
+                  {
+                    jvm_name:signal.jvm_name,
+                    invocation_id:t.invocation_id, value:t.value, thread_id: t.thread_id, 
+                    field_original: t.field, 
+                    field: t.field.split(',')[0].split('@')[1], 
+                    owner_ref: t.owner_ref,
+                    owner: t.owner_ref?"obj":t.field.split(',')[0].split('@')[0],
+                    datetime:t.created_datetime,
+                    op:'write'});
               }else if(t.msg_type=="method_invoke"){
                 var invoke_data = {invocation_id:t.invocation_id,op:'invoke',method:t.method_desc};
                 data.values[t.line_number].push(invoke_data);
@@ -126,26 +281,29 @@ function get_source(signal, parent){
           console.log('query jvm error',err);
           reject(err);
         }else{
-          SourceFile.findOne({user_app:jvm.user_app, types:parent.class_name}, function(err, source_file){
+          var class_name = parent.class_name.split('/').join('.');
+          SourceFile.findOne({user_app:jvm.user_app, types:class_name}, function(err, source_file){
             if(err){
               console.log('query source error',err);
               reject(err);
             }else{
-              //console.log("source file", source_file);
+              console.log("source file", source_file, jvm, parent.class_name);
               var package_name = source_file.ast.package? source_file.ast.package + ".":"";
-              var type = source_file.ast.types.filter((t)=>{return (package_name + t.name) == parent.class_name;})[0];
+              var type = source_file.ast.types.filter((t)=>{return (package_name + t.name) == class_name;})[0];
               //console.log('type', type);
               var codes = [];
+              var begin_line = 0;
               for(var i in type.members){
                 //console.log(type.members[i], type.members[i].pos);
                 var pos = type.members[i].pos;
                 if(pos && signal.line_number >= pos.begin_line && signal.line_number <= pos.end_line){
                   //console.log("match pos", pos);
-                  codes = source_file.source.slice(pos.begin_line - 1, pos.end_line);
+                  codes = source_file.source;//.slice(pos.begin_line - 1, pos.end_line);
+                  //codes.shift();
                   parent.pos = pos;
                 }
               }
-              var data_returned = {signal:signal, parent:parent, codes:codes};
+              var data_returned = {signal:signal, parent:parent, codes:codes,source_file:source_file._id};
               resolve(data_returned);
 
             }
@@ -188,6 +346,26 @@ exports.source =function(req, res){
   console.log(req.query);
 };
 
+exports.fetch_git = function(req, res){
+  //console.log(req.query.uri);
+  //console.log(req.file);
+  var appDir = path.dirname(require.main.filename);    
+ 
+  var date_folder = moment().format('YYYYMMDD_HHmmss');
+  var dest_folder = path.join(appDir, "uploads", date_folder);
+  //var final_filename = path.join(dest_folder, req.file.originalname);
+  fsp.mkdirp(dest_folder)
+    //.then(fsp.move.bind(null, req.file.path, final_filename))
+    .then(exec.bind(null, 'git clone ' + req.query.uri + ' proj', {cwd: dest_folder}))  //'proj' is the local folder name
+    .then(exec.bind(null, 'javac -d . $(find ./src/* | grep .java)', {cwd:dest_folder + "/proj"}))
+    .then(fsp.copy.bind(null, '/home/bwang19/jbd/agent/target/scala-2.10/jbd-agent.jar'
+                        , path.join(dest_folder, "/proj",'jbd-agent.jar')))     
+    .then(parse.bind(null, dest_folder + "/proj"))
+    .then(function(data){
+      res.json({msg:'Build successfully.', data:data});
+    });
+ 
+}
 exports.upload = function(req, res) {
   console.log(req.file);
   var appDir = path.dirname(require.main.filename);    
@@ -266,7 +444,7 @@ exports.run = function(req, res){
   UserApp.findOne({_id:req.query.app_id},function(err, app){
     JvmProcess.createJvmProcess(req.query.main_class_name, app._id).then(function(jvm){
       //var jvm_id = app._id + "_" + moment().format('YYYYMMDDHHmmss');
-      exec(" docker run --name jdevv-exec --link jd-mongo:db -e \"jvm_id=" + jvm._id + "\" -v " + app.folder+ ":/data jdevv java -javaagent:jbd-agent.jar " + jvm.main_class);
+      execDocker(" docker run --name jdevv-exec --link jd-mongo:db -e \"jvm_id=" + jvm._id + "\" -v " + app.folder+ ":/data jdevv java -javaagent:jbd-agent.jar " + jvm.main_class);
       res.json({msg:'Execution starts'});
     }).catch(console.log);
     

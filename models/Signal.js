@@ -15,8 +15,8 @@ var signalSchema = new mongoose.Schema({
   invocation_id: Number,
   method_desc: String,
   incomming_edges: [String],
-  seq: Number
-
+  seq: Number,
+  args: [String]
 });
 
 var Signal = mongoose.model('Signal', signalSchema);

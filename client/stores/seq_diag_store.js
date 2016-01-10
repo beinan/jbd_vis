@@ -67,7 +67,8 @@ export class SignalStore extends CommonStore {
   }
 
   getTitle(){
-    return this.get('method_desc');
+    var method_name = this.get('method_desc').split('(')[0].replace('#', '::'); 
+    return method_name + '(' + this.get('args').join() + ')';
   }
 
 };

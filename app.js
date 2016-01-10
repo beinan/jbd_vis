@@ -52,8 +52,15 @@ app.get('/api/get_next_signals/', diagram.getNextSignals);
 app.get('/api/signal_code_detail/:signal_id', java_source.signal_code_detail);
 app.post('/api/field_monitor', java_source.field_monitor);
 
+app.get('/api/source_line_detail/:source_file/:line_number', java_source.source_line_detail);
+
 app.post('/upload', upload.single('file'), java_source.upload);
+
 app.get('/run', java_source.run);
+app.get('/fetch_git', java_source.fetch_git);
+app.get('/obj_detail', java_source.obj_detail);
+
+app.post('/fields_history_value', java_source.fields_history_value);
 /**
  * Start Express server.
  */

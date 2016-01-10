@@ -151,7 +151,7 @@ function createOutSignals(from_actor, from_lifeline) {
           parent_invocation_id: data.parent_invocation_id
         };
         if(data.owner_ref){
-          new_signal.onwer_ref = data.owner_ref;
+          new_signal.owner_ref = data.owner_ref;
         }
         if(signal_type === "field_getter" || signal_type==="field_setter"){
           new_signal.value = data.value;
@@ -168,13 +168,15 @@ function createOutSignals(from_actor, from_lifeline) {
           .exec()
           .then(
             function(doc){
+              var signal = doc;
               //console.log("findOneAndUpdate or create a signal:", doc);
               if(doc.signal_type == "method_invoke"){//get arguments value
                 Trace.findOne({thread_id: doc.thread_id, invocation_id: doc.invocation_id + 1, msg_type: "method_enter", jvm_name:doc.jvm_name}, function(err, method_enter){
                   if(!err && method_enter){
-                    Trace.find({thread_id: doc.thread_id, invocation_id: doc.invocation_id + 1, msg_type: "method_argument", jvm_name:doc.jvm_name}, function(err, arguments){
+                    Trace.find({thread_id: doc.thread_id, invocation_id: doc.invocation_id + 1, msg_type: "method_argument", jvm_name:doc.jvm_name}).sort({arg_seq:1}).exec(function(err, arguments){
                       var args = arguments.map(function(a){return a.value;});
-                      
+                      signal.args = args;
+                      signal.save();
                     });
                   }
                 });
