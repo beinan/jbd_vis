@@ -6,6 +6,7 @@ var Signal = require('../models/Signal.js');
 
 exports.signalTopSort = function(jvm_name){
   return buildEdges(jvm_name).then(function(count){
+    console.log("top sort start...");
     var p = new Promise(function(resolve, reject){
       topSortReduce(jvm_name, resolve, reject, 0);       
       //resolve(count);
@@ -36,7 +37,7 @@ function topSortReduce(jvm_name, resolve, reject, count){
 }     
 function buildEdges(jvm_name){
   
-  console.log("top sort start");
+  console.log("building edges...");
   var stream = Signal.find({_id: {"$regex": "^" + jvm_name}}).stream();
   var counter = 0;
   var promise = new Promise(
@@ -45,19 +46,19 @@ function buildEdges(jvm_name){
         counter++;
         this.pause();
         var self = this;
-        console.log("signal loaded", doc);
+        //console.log("signal loaded", doc);
         findIncomingEdge(doc).then(
           function(edges){
-            console.log(edges);
+            //console.log(edges);
             //if(doc.thread_id !== edges[0][0].thread_id)
             edges = edges
               .filter(function(edge){return edge.length > 0;})
               .map(function(edge) {return edge[0]._id;});
-            console.log("incomming edge",doc._id, edges);
+            //console.log("incomming edge",doc._id, edges);
             Signal.update({_id:doc._id}, {$set: {incomming_edges: edges}})
               .exec(
                 function(err,res){
-                  console.log("update incomming edges",err, res);
+                  //console.log("update incomming edges",err, res);
                   self.resume();
                 }
               );
@@ -83,13 +84,13 @@ function findIncomingEdge(doc){
   var p1 = query({jvm_name:doc.jvm_name, thread_id: doc.thread_id, invocation_id:{$lt:doc.invocation_id}},
                  {invocation_id:-1}, 1);
   promises.push(p1);
-  console.log(doc.signal_type);
+  //console.log(doc.signal_type);
   var q;
   if(doc.signal_type == "field_setter"){
     q = {jvm_name:doc.jvm_name, field: doc.field, signal_type: "field_setter", version: {$lt:doc.version}};
     if(doc.owner_ref)
       q.owner_ref = doc.owner_ref;
-    console.log(q);
+    //console.log(q);
     var p2 = query(q, {version:-1}, 1);
     promises.push(p2);
   }else if(doc.signal_type == "field_getter"){
@@ -98,7 +99,20 @@ function findIncomingEdge(doc){
       q.owner_ref = doc.owner_ref;
     var p3 = query(q, {}, 1);
     promises.push(p3);    
-  }
+  }else if(doc.signal_type == "array_setter"){
+    q = {jvm_name:doc.jvm_name, signal_type: "array_setter", version: {$lt:doc.version}};
+    if(doc.owner_ref)
+      q.owner_ref = doc.owner_ref;
+    //console.log(q);
+    var p4 = query(q, {version:-1}, 1);
+    promises.push(p4);
+  }else if(doc.signal_type == "array_getter"){
+    q = {jvm_name:doc.jvm_name, signal_type: "array_setter", version: doc.version};
+    if(doc.owner_ref)
+      q.owner_ref = doc.owner_ref;
+    var p5 = query(q, {}, 1);
+    promises.push(p5);    
+  }  
 
   return Promise.all(promises);
 }

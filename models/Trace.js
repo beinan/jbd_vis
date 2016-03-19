@@ -9,11 +9,13 @@ var traceSchema = new mongoose.Schema({
   msg_type: String,
   parent_invocation_id: Number,
   field: String,
+  index:Number,
   line_number: Number,
   owner_ref: Number,
   version: Number,
   value: String,
-  arg_seq:Number
+  arg_seq:Number,
+  created_datetime: Date
 }, {collection: 'trace'});
 
 var Trace = mongoose.model('Trace', traceSchema);

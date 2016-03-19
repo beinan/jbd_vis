@@ -33,21 +33,21 @@ exports.createSeqDiagram = function(jvm_name, selected_classes){
   actor_q['$or'] = selected_classes.map(function(class_name){
     return {owner: class_name};  //select by class name
   });
-  console.log(actor_q);
+  //console.log(actor_q);
   var actor_q_promise = promise_wrapper(Actor.find(actor_q));
   
   var signal_q = {jvm_name: jvm_name, signal_type:"method_invoke"};
   signal_q['$or'] = selected_classes.map(function(class_name){
     return {method_desc: {$regex: "^" + class_name}};  //select by class name
   });
-  console.log(JSON.stringify(signal_q));
+  //console.log(JSON.stringify(signal_q));
   var signal_q_promise = promise_wrapper(Signal.find(signal_q).sort({seq:1}));
 
   var lifeline_q = {};
   lifeline_q['$or'] = selected_classes.map(function(class_name){
     return {_id: {$regex: "^" + jvm_name + ':' + class_name}};  //select by class name
   });
-  console.log(JSON.stringify(lifeline_q));
+  //console.log(JSON.stringify(lifeline_q));
   var lifeline_q_promise = promise_wrapper(Lifeline.find(lifeline_q).sort({seq:1}));
 
   var promises = [actor_q_promise, signal_q_promise, lifeline_q_promise];
@@ -63,7 +63,7 @@ exports.createSeqDiagram = function(jvm_name, selected_classes){
 exports.buildActorAndSignals = function(jvm_name, selected_classes){
   //console.log(SeqBuilder.createBuilder);
   return SeqBuilder.createBuilder(jvm_name).then(function(builder){
-    console.log(builder);
+    //console.log(builder);
     if(builder.status == "processing")
       throw "Builder is processing. Please wait.";
     //console.log("startBuilding function", builder.startBuilding);
@@ -92,7 +92,9 @@ function naive_build(builder){
           //console.log("promise return", p);
           var from_actor = p[0];
           var from_lifeline = p[1];
+          //self.resume();
           var f_p = createOutSignals(from_actor, from_lifeline);
+          
           f_p.then(function(){
             self.resume();
           });
@@ -130,16 +132,16 @@ function createOutSignals(from_actor, from_lifeline) {
     jvm_name:from_actor.jvm_name,
     parent_invocation_id: from_lifeline.invocation_id,
     thread_id: from_lifeline.thread_id,
-    msg_type: {$in:["field_setter", "field_getter", "method_invoke"]}
+    msg_type: {$in:["field_setter", "field_getter", "method_invoke", "array_setter", "array_getter", "method_return"]}
     
   }).stream();
-  //console.log("from lifeline", from_lifeline);
+  console.log("from lifeline", from_lifeline);
   var counter = 0;
   var promise = new Promise(
     function(resolve, reject) {
       stream.on('data', function (data) {
         counter ++;
-//        console.log("out signals tracing data",data);
+        console.log("out signals tracing data",data);
         var signal_id = from_actor.jvm_name + ':' + data.thread_id + ":" + data.invocation_id;
         var signal_type = data.msg_type;
         var new_signal = {
@@ -148,22 +150,32 @@ function createOutSignals(from_actor, from_lifeline) {
           thread_id: data.thread_id,
           invocation_id: data.invocation_id,
           signal_type: data.msg_type,
-          parent_invocation_id: data.parent_invocation_id
+          parent_invocation_id: data.parent_invocation_id,
+          created_datetime: data.created_datetime
         };
         if(data.owner_ref){
           new_signal.owner_ref = data.owner_ref;
         }
+        
         if(signal_type === "field_getter" || signal_type==="field_setter"){
           new_signal.value = data.value;
           new_signal.version = data.version;
           new_signal.field = data.field;
           //new_signal.line_number = data.line_number;
-        } else {
+        } else if(signal_type === "array_getter" || signal_type==="array_setter"){
+          new_signal.index = data.index;
+          new_signal.field = "array@" + data.index + ",A";
+          new_signal.value = data.value;
+          new_signal.version = data.version;
+         
+        }else {
           new_signal.method_desc = data.method_desc;
+          if(data.invokee_id)
+            new_signal.invokee_id = data.invokee_id;
         }
         if(data.line_number)
           new_signal.line_number = data.line_number;
-        //console.log("signal data", new_signal);
+        console.log("signal data", new_signal);
         var s_p = Signal.findOneAndUpdate({_id:signal_id}, {$set: new_signal}, {upsert:true, new:true})
           .exec()
           .then(

@@ -8,7 +8,7 @@ import AppAction from './actions/app_action';
 import ViewType from './view_type';
 import StoreFactory from './stores/store_factory';
 
-google.load('visualization', '1.0', {'packages':['corechart']});
+google.load('visualization', '1.0', {'packages':['corechart', "timeline"]});
 google.setOnLoadCallback(function() {
   AppAction.setHeight($(window).height());
   $(window).resize(()=> AppAction.setHeight($(window).height()));

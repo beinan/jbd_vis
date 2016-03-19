@@ -19,7 +19,8 @@ var type_map = {
   F: 'float',
   D: 'double',
   C: 'char',
-  L: 'class'
+  L: 'class',
+  A: 'array element'
 };
 exports.obj_detail = function(req, res){
   console.log(req.query.obj_ref);
@@ -34,7 +35,7 @@ exports.obj_detail = function(req, res){
         var field_name = id.split('@')[1].split(',')[0];
         var field_type = id.split(',')[1];
         return {field_id:s._id, class_name:class_name, field_name:field_name, field_type:type_map[field_type]};
-      });
+      }).sort(function(a, b){return a.field_name > b.field_name;});
       console.log(fields);
       res.json({fields:fields});
   });
@@ -43,6 +44,8 @@ exports.obj_detail = function(req, res){
 }
 exports.source_line_detail = function(req, res){
   var line_number = req.params.line_number;
+  var jvm_id = req.params.jvm_id;
+  console.log("source_line_detail", req.params);
   SourceFile.findOne({_id:req.params.source_file}, function(err, source_file){
     if(err){
       console.log('query source error',err);
@@ -58,11 +61,11 @@ exports.source_line_detail = function(req, res){
             var class_name = package_name + t.name;
             var method_desc = class_name + "#" + m.name;
             console.log("matched method:", method_desc);
-            Trace.find({method_desc:{$regex:'^' + method_desc}, msg_type:'method_enter'}, {invocation_id:1},function(err, traces){
+            Trace.find({jvm_name:jvm_id, method_desc:{$regex:'^' + method_desc}, msg_type:'method_enter'}, {invocation_id:1},function(err, traces){
               //console.log(traces);
               var parent_ids = traces.map((t) => t.invocation_id);
-              console.log(parent_ids);
-              Signal.find({parent_invocation_id:{$in:parent_ids}, line_number:line_number}).sort({seq:1}).exec(function(err, signals){
+              //console.log(parent_ids);
+              Signal.find({jvm_name: jvm_id, parent_invocation_id:{$in:parent_ids}, line_number:line_number}).sort({seq:1}).exec(function(err, signals){
                 //console.log("singals", err, signals);
                 var result = {};
                 signals.forEach((s)=> {
@@ -70,12 +73,39 @@ exports.source_line_detail = function(req, res){
                     result[s.thread_id] = {};
                   }
                   if(!result[s.thread_id][s.parent_invocation_id]){
-                    result[s.thread_id][s.parent_invocation_id] = [];
+                    result[s.thread_id][s.parent_invocation_id] = {signals:[]};
                   }
-                  result[s.thread_id][s.parent_invocation_id].push(s);
+                  result[s.thread_id][s.parent_invocation_id].signals.push(s);
                 });
                 //console.log(result);
-                res.json({data:result});
+                Signal.aggregate(
+                  [{$match:{jvm_name: jvm_id, parent_invocation_id:{$in:parent_ids}}},
+                     {$group:{_id:{parent_id:"$parent_invocation_id", thread_id:'$thread_id'},
+                              start:{$min:"$created_datetime"}, 
+                              end:{$max:"$created_datetime"},
+                              first_invocation: {$min:"$invocation_id"},
+                              last_invocation: {$max:"$invocation_id"}
+                             }}], 
+                    function(err, mis){
+                      console.log(mis);
+                      ;
+                      var min = mis[0].start.getTime();
+                      mis.forEach(function(mi){
+                        if(mi.start.getTime() < min){
+                          min = mi.start.getTime();
+                        }
+                      });
+                      mis.forEach(function(mi){
+                        if(result[mi._id.thread_id] && result[mi._id.thread_id][mi._id.parent_id]){
+                          result[mi._id.thread_id][mi._id.parent_id].start = mi.start.getTime() - min;
+                          result[mi._id.thread_id][mi._id.parent_id].end = mi.end.getTime() - min;
+                        }
+                      });
+                      console.log("source line detail result:", result);
+                      res.json({data:result});
+                    });
+
+
               });
               
             });
@@ -136,15 +166,30 @@ exports.fields_history_value = function(req, res){
   console.log("field_history_value", req.body);
   var jvm_name = req.body.jvm_name;
   var seq = 0;
+ 
   var promises = req.body.fields.filter((d)=>{return d.active;}).map((f)=>{
+    var q;
+    if(f.class_name == "array"){
+      q = {
+        jvm_name: jvm_name,
+        owner_ref: req.body.obj_ref,
+        index:parseInt(f.field_name), 
+        signal_type:{$in:['array_getter', 'array_setter']}
+      };
+    
+    }else{
+
+      q = {
+        jvm_name: jvm_name,
+        owner_ref: req.body.obj_ref,
+        field:f.field_id, 
+        signal_type:{$in:['field_getter', 'field_setter']}
+      };
+    }
+    console.log("field query", q);
     return new Promise(
       function(resolve, reject){
-        var query = Signal.find({
-          jvm_name: jvm_name,
-          owner_ref: req.body.obj_ref,
-          field:f.field_id, 
-          signal_type:{$in:['field_getter', 'field_setter']}
-        }).sort({seq: 1});
+        var query = Signal.find(q).sort({seq: 1});
         query.exec(function(err, doc){
           if(err){
             reject(err);
@@ -247,6 +292,27 @@ function map_values(data){
                     field: t.field.split(',')[0].split('@')[1], 
                     owner_ref: t.owner_ref,
                     owner: t.owner_ref?"obj":t.field.split(',')[0].split('@')[0],
+                    datetime:t.created_datetime,
+                    op:'write'});
+              }else if(t.msg_type=='array_getter'){
+                data.values[t.line_number].push(
+                  {
+                   jvm_name:signal.jvm_name,
+                   invocation_id:t.invocation_id, value:t.value, thread_id: t.thread_id, 
+                   index: t.index, 
+                   owner_ref: t.owner_ref,
+                   owner: "array",
+                   datetime:t.created_datetime,
+                   op:'read'}); 
+              }else if(t.msg_type=='array_setter'){
+                console.log("setter:", t);
+                data.values[t.line_number].push(
+                  {
+                    jvm_name:signal.jvm_name,
+                    invocation_id:t.invocation_id, value:t.value, thread_id: t.thread_id, 
+                    owner_ref: t.owner_ref,
+                    index: t.index,
+                    owner: "array",
                     datetime:t.created_datetime,
                     op:'write'});
               }else if(t.msg_type=="method_invoke"){

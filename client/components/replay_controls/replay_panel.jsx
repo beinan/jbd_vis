@@ -22,7 +22,11 @@ class SourceLine extends React.Component{
   constructor(props){
     super(props);
     this.state= {is_value_display:false};
-    this.sourceLineDetailStore = new SourceLineDetailStore({line_number:props.line_number, source_file:props.source_file});
+    this.sourceLineDetailStore = new SourceLineDetailStore(
+      {line_number:props.line_number, 
+       source_file:props.source_file,
+       jvm_id : props.jvm_id
+      });
     this.componentDidMount = this.componentDidMount.bind(this);
   }
   
@@ -55,8 +59,18 @@ class SourceLine extends React.Component{
         var msg="";
         var ops = null; //operation buttons if available
         if(v.op == "read"){
-          msg = "Get " + v.value + " from " + v.field;
+          var overlay = <ObjectRefPopover obj_ref={v.owner_ref} jvm_name={v.jvm_name}></ObjectRefPopover>
+          msg = (
+            <span>{'Get ' + v.value + " from "}
+              <OverlayTrigger trigger="click" placement="top" rootClose="true" 
+                              overlay={<Popover title="Object Reference View">{overlay}</Popover>}>
+                <Button bsStyle="warning" bsSize="xsmall">{v.owner}</Button>
+              </OverlayTrigger>
+              .
+              <Button bsStyle="default" bsSize="xsmall">{v.field}{v.index}</Button>
+            </span>);
           ops = (<Button onClick={watch.bind(null, v)} bsSize="xsmall" bsStyle="success">Watch</Button>);
+          //ops = (<Button onClick={watch.bind(null, v)} bsSize="xsmall" bsStyle="success">Watch</Button>);
         }else if(v.op == 'write'){
           var overlay = <ObjectRefPopover obj_ref={v.owner_ref} jvm_name={v.jvm_name}></ObjectRefPopover>
           msg = (
@@ -66,7 +80,7 @@ class SourceLine extends React.Component{
                 <Button bsStyle="warning" bsSize="xsmall">{v.owner}</Button>
               </OverlayTrigger>
               .
-              <Button bsStyle="default" bsSize="xsmall">{v.field}</Button>
+              <Button bsStyle="default" bsSize="xsmall">{v.field}{v.index}</Button>
             </span>);
           ops = (<Button onClick={watch.bind(null, v)} bsSize="xsmall" bsStyle="success">Watch</Button>);       
         }else if(v.op == 'invoke'){
@@ -119,6 +133,7 @@ class SourceCodePanel extends PureRenderComponent{
                       display_value={data.values[line_number]}
                       source_file={data.source_file}
                       simulation_detail_store={this.props.store}
+                      jvm_id = {this.props.jvm_id} 
           />
         );
       });
@@ -166,13 +181,16 @@ class ReplayPanel extends PureRenderComponent{
   //}
 
   render(){
-    console.log("ReplayPanel is rendering", this.props, this.state);
+    //console.log("ReplayPanel is rendering", this.props, this.state);
     var current_signal = this.props.store.getCurrentSignal();
-    console.log("current signal", current_signal);
+    //console.log("current signal", current_signal);
     var codes, json;
     if(this.props.store.getCurrentSignalDetailStore()){
-      console.log("update source code panel");
-      codes = <SourceCodePanel key={this.props.store.getCurrentSignal()._id} store={this.props.store.getCurrentSignalDetailStore()}/>
+      //console.log("update source code panel");
+      codes = <SourceCodePanel key={this.props.store.getCurrentSignal()._id} 
+                               store={this.props.store.getCurrentSignalDetailStore()}
+                               jvm_id = {this.props.store.get("jvm_id")}
+              />
     }
     /*
     if(current_signal && current_signal.line_number){

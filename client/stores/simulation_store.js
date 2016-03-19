@@ -112,9 +112,9 @@ export class SimulationStore extends CommonStore{
     var this_store = this;
     return getJson('/api/get_next_signals/', {start_seq: start_tick, jvm_id:this.get('jvm_id')}).then((data) => {
       
-      console.log("signal data fected from ", data);      
+      //console.log("signal data fected from ", data);      
       for(var s of data){
-        console.log("signal", s.seq, s);
+        //console.log("signal", s.seq, s);
         this_store.signal_cache[s.seq] = s;
         SimulationAction.addOutSignal(s);        
       }
@@ -132,7 +132,7 @@ export class SimulationStore extends CommonStore{
   
   getCurrentSignalDetailStore(){
     if(this.getCurrentSignal())
-      return new SimulationDetailStore(this.getCurrentSignal()._id);
+      return new SimulationDetailStore(this.get("jvm_id"),this.getCurrentSignal()._id);
     return null;
   }
   replayStart(){
@@ -169,8 +169,8 @@ export class SimulationStore extends CommonStore{
  * Maintain detail info about each signal in simualtion
  */
 export class SimulationDetailStore extends RemoteStore{
-  constructor(signal_id){
-    super({},{url:'/api/signal_code_detail/'+signal_id});    
+  constructor(jvm_id, signal_id){
+    super({jvm_id: jvm_id},{url:'/api/signal_code_detail/'+signal_id});    
   }
 };
 

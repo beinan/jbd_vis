@@ -8,7 +8,9 @@ const LIFELINE_WIDTH = 8;
 const OUT_SIGNAL_COLOR = {
   'field_setter':'red',
   'field_getter':'green',
-  'method_invoke': 'blue'
+  'method_invoke': 'blue',
+  'array_setter':'orange',
+  'array_getter': 'black'
 };
 export default class Lifeline extends PureRenderComponent{
   constructor(props){
@@ -35,7 +37,7 @@ export default class Lifeline extends PureRenderComponent{
               style={{fill:signal_color, stroke:signal_color , strokeWidth:0, opacity:0.7}} onClick={onclick}/>
       );
     });
-    console.log("out signal", lifeline.get('out_signals'), out_signals);
+    //console.log("out signal", lifeline.get('out_signals'), out_signals);
     return(
       <g>
         <rect x={center_x - LIFELINE_WIDTH/2} y={y} width={LIFELINE_WIDTH} height={height} 

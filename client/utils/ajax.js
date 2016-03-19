@@ -16,7 +16,8 @@ exports.postJson = function(url, data){
       url: url,
       data: JSON.stringify(data),
       contentType: "application/json; charset=utf-8",
-      dataType: "json"
+      dataType: "json",
+      timeout: 1000000
     }).then(
       (data) => resolve(data), 
       (jqXHR, textStatus, err) => reject(err) 

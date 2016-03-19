@@ -53,7 +53,7 @@ export default class SeqDiagram extends PureRenderComponent{
         <div style={{position: 'fixed',top: 50, left: 200, backgroundColor: 'white'}}>
           <Monitor store={StoreFactory.getSimulationListStore().get("simulation_map").get(this.props.jvm_id).getMonitorStore()}/>
         </div>
-      <svg width={this.state.data.get("width")} height={this.state.data.get("height")}>
+      <svg width={this.state.data.get("width") + 400} height={this.state.data.get("height")}>
         <defs dangerouslySetInnerHTML={{__html: marker}}>          
         </defs>
         {actors}

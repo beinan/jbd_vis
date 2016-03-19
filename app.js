@@ -52,7 +52,7 @@ app.get('/api/get_next_signals/', diagram.getNextSignals);
 app.get('/api/signal_code_detail/:signal_id', java_source.signal_code_detail);
 app.post('/api/field_monitor', java_source.field_monitor);
 
-app.get('/api/source_line_detail/:source_file/:line_number', java_source.source_line_detail);
+app.get('/api/source_line_detail/:source_file/:jvm_id/:line_number', java_source.source_line_detail);
 
 app.post('/upload', upload.single('file'), java_source.upload);
 
@@ -64,10 +64,11 @@ app.post('/fields_history_value', java_source.fields_history_value);
 /**
  * Start Express server.
  */
-app.listen(app.get('port'), function() {
+var server = app.listen(app.get('port'), function() {
   console.log('Express server listening on port %d in %s mode', app.get('port'), app.get('env'));
 });
 
+server.timeout = 1000000;
 module.exports = app;
 
 

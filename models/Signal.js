@@ -9,14 +9,17 @@ var signalSchema = new mongoose.Schema({
   parent_invocation_id: Number,
   version: Number,
   field: String,
+  index: Number,
   owner_ref: Number,
   line_number: Number,  
   thread_id: Number,
   invocation_id: Number,
+  invokee_id: Number, //for method return value
   method_desc: String,
   incomming_edges: [String],
   seq: Number,
-  args: [String]
+  args: [String],
+  created_datetime: Date
 });
 
 var Signal = mongoose.model('Signal', signalSchema);
