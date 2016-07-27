@@ -132,7 +132,8 @@ function createOutSignals(from_actor, from_lifeline) {
     jvm_name:from_actor.jvm_name,
     parent_invocation_id: from_lifeline.invocation_id,
     thread_id: from_lifeline.thread_id,
-    msg_type: {$in:["field_setter", "field_getter", "method_invoke", "array_setter", "array_getter", "method_return"]}
+    msg_type: {$in:["field_setter", "field_getter", "method_invoke", "array_setter", 
+                    "array_getter", "method_return","MonitorRequest", "MonitorEnter", "MonitorExit"]}
     
   }).stream();
   console.log("from lifeline", from_lifeline);

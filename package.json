@@ -37,6 +37,7 @@
     "react-bootstrap": "^0.28.2",
     "react-dom": "^0.14.6",
     "react-google-charts": "^0.2.0",
+    "react-json-tree": "^0.10.0",
     "shallow-equals": "0.0.0",
     "shelljs": "^0.5.1",
     "unzip": "^0.1.11"

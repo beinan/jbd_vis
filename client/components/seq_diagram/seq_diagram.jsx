@@ -7,6 +7,9 @@ import {ImmutablePropComponent, PureRenderComponent, ContentBox} from '../common
 
 import SimulationBar from '../replay_controls/simulation_bar.jsx'
 import Monitor from '../replay_controls/monitor.jsx'
+import ThreadsPanel from '../replay_controls/threads_panel.jsx'
+import QueryPanel from '../replay_controls/query_panel.jsx'
+
 
 import StoreFactory from '../../stores/store_factory'
 
@@ -53,6 +56,13 @@ export default class SeqDiagram extends PureRenderComponent{
         <div style={{position: 'fixed',top: 50, left: 200, backgroundColor: 'white'}}>
           <Monitor store={StoreFactory.getSimulationListStore().get("simulation_map").get(this.props.jvm_id).getMonitorStore()}/>
         </div>
+        <div style={{position: 'fixed',top: 88, left: 200}}>
+          <ThreadsPanel store={StoreFactory.getSimulationListStore().get("simulation_map").get(this.props.jvm_id)}/>
+        </div>
+        <div style={{position: 'fixed',top: 88, left: 400}}>
+          <QueryPanel store={StoreFactory.getSimulationListStore().get("simulation_map").get(this.props.jvm_id)}/>
+        </div>
+
       <svg width={this.state.data.get("width") + 400} height={this.state.data.get("height")}>
         <defs dangerouslySetInnerHTML={{__html: marker}}>          
         </defs>
